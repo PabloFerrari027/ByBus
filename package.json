@@ -15,12 +15,13 @@
   "type": "module",
   "main": "src/server.ts",
   "scripts": {
-    "dev": "tsx watch src/core/shared/infra/http/server.ts",
-    "start": "node build/core/shared/infra/http/server.js",
+    "dev": "tsx watch src/main.ts",
+    "start": "node build/main.js",
     "build": "tsc",
     "commit": "cz"
   },
   "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
     "@types/node": "^22.15.3",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "cz-conventional-changelog": "^3.3.0",
@@ -35,6 +36,7 @@
     "typescript": "^5.8.3"
   },
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "commitizen": "^4.3.1",
     "eslint-config-prettier": "^10.1.2",
     "tsx": "^4.19.4",

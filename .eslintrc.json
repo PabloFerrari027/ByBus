@@ -25,10 +25,10 @@
       "@typescript-eslint/no-empty-function": "error",
       "@typescript-eslint/no-inferrable-types": "error",
       "@typescript-eslint/ban-ts-comment": "error",
-      "@typescript-eslint/adjacent-overload-signatures": "off",
-      "@typescript-eslint/no-empty-interface": "off",
-      "@typescript-eslint/ban-types": "off",
-      "no-async-promise-executor": "off"
+      // "@typescript-eslint/adjacent-overload-signatures": "off",
+      // "@typescript-eslint/no-empty-interface": "off",
+      // "@typescript-eslint/ban-types": "off",
+      // "no-async-promise-executor": "off"
     }
   }
   
