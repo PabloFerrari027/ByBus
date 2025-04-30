@@ -17,7 +17,7 @@
   "scripts": {
     "dev": "tsx watch src/main.ts",
     "start": "node build/main.js",
-    "build": "tsc",
+    "build": "tsc && tsc-alias",
     "commit": "cz"
   },
   "devDependencies": {
@@ -39,6 +39,7 @@
     "bcrypt": "^5.1.1",
     "commitizen": "^4.3.1",
     "eslint-config-prettier": "^10.1.2",
+    "tsc-alias": "^1.8.15",
     "tsx": "^4.19.4",
     "typescript-eslint": "^8.31.1"
   },
