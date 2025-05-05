@@ -4,7 +4,11 @@ import { Email } from '@/domain/value-objects/Email.js';
 import { UUID } from '@/domain/value-objects/UUID.js';
 
 export class InMemoryUsersRepository implements UsersRepository {
-	private items: User[] = [];
+	private items: User[];
+
+	constructor() {
+		this.items = [];
+	}
 
 	async create(user: User): Promise<User> {
 		this.items.push(user);

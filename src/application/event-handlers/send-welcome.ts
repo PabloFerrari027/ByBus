@@ -1,5 +1,5 @@
 import { UsersRepository } from '../ports/repositories/users-repository.js';
-import { Handler } from '../ports/handler/handler.js';
+import { Handler } from '../../shared/core/queues/handler.js';
 import { CreatedUserEvent } from '@/domain/events/created-user-event.js';
 import { User } from '@/domain/entities/user.js';
 import { NotificationsProvider } from '../ports/providers/notifications-provider.js';

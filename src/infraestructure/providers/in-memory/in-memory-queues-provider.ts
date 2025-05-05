@@ -1,4 +1,4 @@
-import { Handler } from '@/application/ports/handler/handler.js';
+import { Handler } from '@/shared/core/queues/handler.js';
 import {
 	Queue as IQeue,
 	QueueItem as IQueueItem,
@@ -26,16 +26,15 @@ export class QueueItem extends IQueueItem {
 
 export class Queue extends IQeue {
 	private readonly _key: string;
-	private readonly items: Array<QueueItem>;
+	private readonly items: Array<QueueItem> = [];
 
 	constructor(key: string) {
 		super();
 		this._key = key;
-		this.items = [];
 	}
 
 	get key(): string {
-		return this.key;
+		return this._key;
 	}
 
 	subscribe(key: string, handler: Handler): void {

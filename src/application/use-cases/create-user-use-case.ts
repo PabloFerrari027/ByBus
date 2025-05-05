@@ -1,14 +1,23 @@
 import { Text } from '@/domain/value-objects/Text.js';
 import { User } from '@/domain/entities/user.js';
-import { left, right } from '@/shared/types/either.js';
-import { CreateUser as ICreateUser, Input, Output } from '../ports/use-cases/create-user.js';
+import { Either, left, right } from '@/shared/types/either.js';
 import { UsersRepository } from '../ports/repositories/users-repository.js';
 import { AlreadyExists } from '@/domain/errors/already-exists.js';
 import { NotAccptable } from '@/domain/errors/not-accptable.js';
 import { EventBus } from '@/infraestructure/event-bus/event-bus.js';
 import { CreatedUserEvent } from '@/domain/events/created-user-event.js';
+import { UseCase } from '@/shared/core/use-cases/use-case.js';
 
-export class CreateUser extends ICreateUser {
+export interface Input {
+	name: string;
+	email: string;
+	password: string;
+}
+export type Left = AlreadyExists | null;
+export type Right = { id: string; name: string; email: string };
+export type Output = Promise<Either<Left, Right>>;
+
+export class CreateUserUseCase extends UseCase<Input, Output> {
 	private user: User | null;
 
 	constructor(private readonly usersRepository: UsersRepository) {
@@ -59,6 +68,10 @@ export class CreateUser extends ICreateUser {
 
 		await EventBus.publish(CreatedUserEvent.name, new CreatedUserEvent({ userId: this.user.id }));
 
-		return right(null);
+		return right({
+			id: this.user.id.value,
+			name: this.user.name.value,
+			email: this.user.email.value,
+		});
 	}
 }

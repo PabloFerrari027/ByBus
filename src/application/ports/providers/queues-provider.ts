@@ -1,4 +1,4 @@
-import { Handler } from '../handler/handler.js';
+import { Handler } from '../../../shared/core/queues/handler.js';
 
 export abstract class QueueItem {
 	abstract get key(): string;
