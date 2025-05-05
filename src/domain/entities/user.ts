@@ -22,6 +22,15 @@ export interface ICreate {
 	updatedAt?: Date;
 }
 
+export interface JSON {
+	id: string;
+	name: string;
+	email: string;
+	password: string;
+	created_at: string;
+	updated_at: string;
+}
+
 export class User {
 	private props: Props;
 	private events: Array<UpdatedUserEvent>;
@@ -82,6 +91,17 @@ export class User {
 		const events = this.events;
 		this.events = [];
 		return events;
+	}
+
+	toJSON(): JSON {
+		return {
+			id: this.id.value,
+			email: this.email.value,
+			name: this.name.value,
+			password: this.password.value,
+			updated_at: this.updatedAt.toJSON(),
+			created_at: this.createdAt.toJSON(),
+		};
 	}
 
 	static create(props: ICreate): User {

@@ -3,9 +3,9 @@ import { NotAccptable } from '@/domain/errors/not-accptable.js';
 import { NotFound } from '@/domain/errors/not-found.js';
 
 export interface Input {
-	body?: unknown;
-	params?: unknown;
-	query?: unknown;
+	body?: any;
+	params?: any;
+	query?: any;
 }
 
 export type Output = Promise<{

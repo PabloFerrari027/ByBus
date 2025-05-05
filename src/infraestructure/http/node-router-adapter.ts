@@ -24,7 +24,22 @@ export class NodeRouterAdapter implements Router {
 		let body = '';
 		req.on('data', chunk => (body += chunk));
 		await new Promise(resolve => req.on('end', () => resolve(null)));
+		if (!body) return {};
 		return JSON.parse(body);
+	}
+
+	private parseQuery(query: Record<string, unknown>) {
+		const parsed: Record<string, unknown> = {};
+		for (const key in query) {
+			let value = query[key];
+
+			if (value === 'true') value = true;
+			else if (value === 'false') value = false;
+			else if (!isNaN(Number(value))) value = Number(value);
+
+			parsed[key] = value;
+		}
+		return parsed;
 	}
 
 	async handler(req: IncomingMessage, res: ServerResponse, routes: RouteDefinition[]) {
@@ -40,14 +55,16 @@ export class NodeRouterAdapter implements Router {
 
 		try {
 			const body = await this.processData(req);
+			const parsedUrl = parse(req.url || '', true);
+			const query = this.parseQuery(parsedUrl.query);
 			for await (const handler of matched.middlewares || []) {
-				const response = await handler.execute({ body });
+				const response = await handler.execute({ body, query });
 				if (response.next) continue;
 				res.setHeader('Content-Type', 'application/json');
 				res.end(JSON.stringify(response.data));
 				return;
 			}
-			const response = await matched.handler.handle({ body });
+			const response = await matched.handler.handle({ body, query });
 			res.statusCode = response.status;
 			if (response.data) {
 				res.setHeader('Content-Type', 'application/json');
