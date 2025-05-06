@@ -12,7 +12,7 @@ export class FindUserByIdController extends Controller {
 		const query = input.query;
 		const id = input.query.id;
 		const useCase = new FindUserByIdUseCase(this.usersRepository);
-		const response = await useCase.execute({ id });
+		const response = await useCase.hanlde({ id });
 		const isRight = response.isRight();
 		let fields = { ...query, id: true };
 		if (Object.keys(fields).length === 1) fields = {};

@@ -12,7 +12,7 @@ export class FindUserByEmailController extends Controller {
 		const query = input.query;
 		const email = query.email;
 		const useCase = new FindUserByEmailUseCase(this.usersRepository);
-		const response = await useCase.execute({ email });
+		const response = await useCase.hanlde({ email });
 		const isRight = response.isRight();
 		let fields = { ...query, email: true };
 		if (Object.keys(fields).length === 1) fields = {};

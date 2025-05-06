@@ -5,10 +5,10 @@ type Data = {
 	userId: UUID;
 };
 
-export class CreatedUserEvent extends Event<Data> {
+export class PasswordChangeEvent extends Event<Data> {
 	private readonly _data: Data;
-	static _key = 'created-user-event';
-	private readonly _k = 'created-user-event';
+	static _key = 'password-change-event';
+	private readonly _k = 'password-change-event';
 
 	constructor(data: Data) {
 		super();
@@ -19,11 +19,11 @@ export class CreatedUserEvent extends Event<Data> {
 		return this._data;
 	}
 
-	static get key() {
+	static get key(): string {
 		return this._key;
 	}
 
-	get key() {
+	get key(): string {
 		return this._k;
 	}
 }

@@ -9,11 +9,11 @@ export class EventBus {
 		this.channels.get(key)?.push(channel);
 	}
 
-	static async publish(key: string, event: Event<unknown>) {
-		const channels = this.channels.get(key) || [];
+	static async publish(event: Event<unknown>) {
+		const channels = this.channels.get(event.key) || [];
 
 		for await (const channel of channels) {
-			await channel.publish(event);
+			await channel.publish(event.key, event);
 		}
 	}
 }

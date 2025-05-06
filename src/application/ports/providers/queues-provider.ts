@@ -8,11 +8,10 @@ export abstract class QueueItem {
 export abstract class Queue {
 	abstract get key(): string;
 	abstract subscribe(key: string, handler: Handler): void;
-	abstract publish(data: any): Promise<void>;
+	abstract publish(key: string, data: any): Promise<void>;
 }
 
 export abstract class QueuesProvider {
-	abstract connect(): Promise<void>;
 	abstract create(key: string): Promise<Queue>;
 	abstract get(key: string): Promise<Queue | null>;
 }

@@ -1,7 +1,7 @@
 import { NotificationStrategy } from '@/application/strategies/notification-strategy.js';
 import { NotificationsProvider as INotificationsProvider } from '@/application/ports/providers/notifications-provider.js';
 
-export class InMemoryNotificationsProvider extends INotificationsProvider {
+export class ConsoleNotificationsProvider extends INotificationsProvider {
 	constructor(private readonly notificationStrategy: NotificationStrategy) {
 		super(notificationStrategy);
 	}

@@ -18,11 +18,13 @@
     "dev": "tsx watch src/main.ts",
     "start": "node build/main.js",
     "build": "tsc && tsc-alias",
-    "commit": "cz"
+    "commit": "cz",
+    "docker:compose": "docker compose --project-name bybus_prod -f docker/docker-compose.prod.yml up -d"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
     "@types/node": "^22.15.3",
+    "@types/nodemailer": "^6.4.17",
     "@typescript-eslint/eslint-plugin": "^6.21.0",
     "cz-conventional-changelog": "^3.3.0",
     "eslint": "^8.57.1",
@@ -38,7 +40,11 @@
   "dependencies": {
     "bcrypt": "^5.1.1",
     "commitizen": "^4.3.1",
+    "dotenv": "^16.5.0",
     "eslint-config-prettier": "^10.1.2",
+    "marked": "^15.0.11",
+    "mongodb": "^6.16.0",
+    "nodemailer": "^7.0.2",
     "tsc-alias": "^1.8.15",
     "tsx": "^4.19.4",
     "typescript-eslint": "^8.31.1",

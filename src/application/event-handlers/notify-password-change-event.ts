@@ -7,7 +7,7 @@ import { NotificationService } from '../services/notification-service.js';
 import { TemplateRepository } from '../ports/repositories/templates-repository.js';
 import { LoggerProvider } from '../ports/providers/logger-provider.js';
 
-export class SendWelcome extends Handler {
+export class NotifyPasswordChangeEvent extends Handler {
 	private user: User | null;
 
 	constructor(
@@ -30,10 +30,9 @@ export class SendWelcome extends Handler {
 
 			return;
 		}
-
 		const notificationService = new NotificationService(this.templateRepository);
 
-		const message = await notificationService.getMessage('WELCOME', {
+		const message = await notificationService.getMessage('PASSWORD-CHANGE', {
 			userName: this.user.name.value,
 		});
 

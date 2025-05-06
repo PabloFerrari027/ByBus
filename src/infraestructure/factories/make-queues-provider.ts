@@ -1,5 +1,5 @@
 import { QueuesProvider } from '@/application/ports/providers/queues-provider.js';
-import { InMemoryQueuesProvider } from '../providers/in-memory/in-memory-queues-provider.js';
+import { InMemoryQueuesProvider } from '../providers/in-memory-queues-provider.js';
 
 type Implementation = 'IN-MEMORY';
 

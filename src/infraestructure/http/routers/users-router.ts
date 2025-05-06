@@ -1,3 +1,4 @@
+import { LoggerProvider } from '@/application/ports/providers/logger-provider.js';
 import { FindUserByIdController } from './../../../presentation/controllers/find-user-by-id-controller.js';
 import { UsersRepository } from '@/application/ports/repositories/users-repository.js';
 import { CreateUserController } from '@/presentation/controllers/create-user-controller.js';
@@ -6,24 +7,44 @@ import { ValidateUserCreationRequest } from '@/presentation/middlewares/validate
 import { ValidateUserSearchRequestByEmail } from '@/presentation/middlewares/validate-user-search-request-by-email.js';
 import { ValidateUserSearchRequestById } from '@/presentation/middlewares/validate-user-search-request-by-id.js';
 import { RouteDefinition } from '@/shared/core/http/router.js';
+import { ValidatePasswordResetRequest } from '@/presentation/middlewares/validate-password-reset-request.js';
+import { ResetPasswordController } from '@/presentation/controllers/reset-password-controller.js';
 
 export class UsersRouter {
 	private _routes: RouteDefinition[];
 
-	constructor(private readonly usersRepository: UsersRepository) {
+	constructor(
+		private readonly usersRepository: UsersRepository,
+		private readonly loggerProvider: LoggerProvider,
+	) {
 		this._routes = [];
-		const createUserController = new CreateUserController(this.usersRepository);
+		const createUserController = new CreateUserController(
+			this.usersRepository,
+			this.loggerProvider,
+		);
 		const validateUserCreationRequest = new ValidateUserCreationRequest();
 		const findUserByIdController = new FindUserByIdController(this.usersRepository);
 		const validateUserSearchRequestById = new ValidateUserSearchRequestById();
 		const findUserByEmailController = new FindUserByEmailController(this.usersRepository);
 		const validateUserSearchRequestByEmail = new ValidateUserSearchRequestByEmail();
+		const resetPasswordController = new ResetPasswordController(
+			this.usersRepository,
+			this.loggerProvider,
+		);
+		const validatePasswordResetRequest = new ValidatePasswordResetRequest();
 
 		this._routes.push({
 			method: 'post',
 			path: '/users/create',
 			handler: createUserController,
 			middlewares: [validateUserCreationRequest],
+		});
+
+		this._routes.push({
+			method: 'put',
+			path: '/users/reset/password',
+			handler: resetPasswordController,
+			middlewares: [validatePasswordResetRequest],
 		});
 
 		this._routes.push({

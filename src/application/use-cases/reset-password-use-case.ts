@@ -1,6 +1,6 @@
 import { LoggerProvider } from '@/application/ports/providers/logger-provider.js';
 import { JSON, User } from '@/domain/entities/user.js';
-import { right } from '@/shared/types/either.js';
+import { left, right } from '@/shared/types/either.js';
 import { UsersRepository } from '../ports/repositories/users-repository.js';
 import { AlreadyExists } from '@/domain/errors/already-exists.js';
 import { EventBus } from '@/infraestructure/event-bus/event-bus.js';
@@ -10,16 +10,16 @@ import { Optional } from '@/shared/types/optional.js';
 import { Password } from '@/domain/value-objects/Password.js';
 import { Name } from '@/domain/value-objects/Name.js';
 import { Email } from '@/domain/value-objects/Email.js';
+import { NotFound } from '@/domain/errors/not-found.js';
 
 export interface Input {
-	name: string;
-	email: string;
-	password: string;
+	userId: string;
+	newPassword: string;
 }
 
 export type Right = { user: Optional<JSON, 'password'> };
 
-export class CreateUserUseCase extends UseCase<Right> {
+export class ResetPasswordUseCase extends UseCase<Right> {
 	private user: User | null;
 
 	constructor(
@@ -31,29 +31,34 @@ export class CreateUserUseCase extends UseCase<Right> {
 	}
 
 	async execute(input: Input): Output<Right> {
-		Name.validate(input.name);
-		Email.validate(input.email);
-		Password.validate(input.password);
+		Password.validate(input.newPassword);
 
-		const alreadyExists = await this.usersRepository.findByEmail(input.email);
+		this.user = await this.usersRepository.findById(input.userId);
 
-		if (alreadyExists) {
-			const title = 'User already exists';
-			const message = `User with email ${input.email} already exists`;
-			throw new AlreadyExists(title, message);
+		if (!this.user) {
+			const title = 'User not found';
+			const message = `User with ID ${input.userId} is not found`;
+			const error = new NotFound(title, message);
+			return left(error);
 		}
 
-		this.user = User.create({
-			name: input.name,
-			email: input.email,
-			password: input.password,
-		});
+		const oldPassword = this.user.password.value;
+
+		this.user.changePassword = input.newPassword;
+
+		const newPassword = this.user.password.value;
 
 		this.user = await this.usersRepository.create(this.user);
 
-		await this.loggerProvider.info('User created', { userId: this.user.id.value });
+		await this.loggerProvider.info('User password update', {
+			userId: this.user.id.value,
+			oldPassword,
+			newPassword,
+		});
 
-		await EventBus.publish(new CreatedUserEvent({ userId: this.user.id }));
+		const events = this.user.pullEvents();
+
+		await Promise.all(events.map(async event => await EventBus.publish(event)));
 
 		return right({ user: { ...this.user.toJSON(), password: undefined } });
 	}

@@ -1,5 +1,5 @@
 import { UsersRepository } from '@/application/ports/repositories/users-repository.js';
-import { InMemoryUsersRepository } from '../databases/in-memory/in-memory-users-repository.js';
+import { InMemoryUsersRepository } from '../databases/in-memory-users-repository.js';
 
 type Implementation = 'IN-MEMORY';
 

@@ -1,12 +1,13 @@
-import { UpdatedUserEvent } from '../events/updated-user-event.js';
+import { NameChangeEvent } from '../events/name-change-event.js';
+import { PasswordChangeEvent } from '../events/password-change-event.js';
 import { Email } from '../value-objects/Email.js';
+import { Name } from '../value-objects/Name.js';
 import { Password } from '../value-objects/Password.js';
-import { Text } from '../value-objects/Text.js';
 import { UUID } from '../value-objects/UUID.js';
 
 export interface Props {
 	id: UUID;
-	name: Text;
+	name: Name;
 	email: Email;
 	password: Password;
 	createdAt: Date;
@@ -31,9 +32,11 @@ export interface JSON {
 	updated_at: string;
 }
 
+type Events = Array<PasswordChangeEvent | NameChangeEvent>;
+
 export class User {
 	private props: Props;
-	private events: Array<UpdatedUserEvent>;
+	private events: Events;
 
 	private constructor(props: Props) {
 		this.props = props;
@@ -44,7 +47,7 @@ export class User {
 		return this.props.id;
 	}
 
-	get name(): Text {
+	get name(): Name {
 		return this.props.name;
 	}
 
@@ -65,29 +68,22 @@ export class User {
 	}
 
 	set rename(value: string) {
-		this.props.name = Text.create(value, 'PASCALCASE');
-		this.events.push(new UpdatedUserEvent({ userId: this.id, updatedPropertie: 'name' }));
-		this.touch();
-	}
-
-	set changeEmail(value: string) {
-		this.props.email = Email.create(value);
-		this.events.push(new UpdatedUserEvent({ userId: this.id, updatedPropertie: 'email' }));
+		this.props.name = Name.create(value);
+		this.events.push(new NameChangeEvent({ userId: this.id }));
 		this.touch();
 	}
 
 	set changePassword(value: string) {
-		this.props.password = Password.create(value);
-		this.events.push(new UpdatedUserEvent({ userId: this.id, updatedPropertie: 'password' }));
+		this.props.password = Password.create(Password.hash(value));
+		this.events.push(new PasswordChangeEvent({ userId: this.id }));
 		this.touch();
 	}
 
 	touch() {
 		this.props.updatedAt = new Date();
-		this.events.push(new UpdatedUserEvent({ userId: this.id, updatedPropertie: 'updatedAt' }));
 	}
 
-	pullEvents(): Array<UpdatedUserEvent> {
+	pullEvents(): Events {
 		const events = this.events;
 		this.events = [];
 		return events;
@@ -105,15 +101,13 @@ export class User {
 	}
 
 	static create(props: ICreate): User {
-		const name = Text.create(props.name, 'PASCALCASE');
+		const name = Name.create(props.name);
 		const email = Email.create(props.email);
 		const password = Password.create(Password.hash(props.password));
 		const id = UUID.create(props.id);
 		const createdAt = props.createdAt ?? new Date();
 		const updatedAt = props.updatedAt ?? new Date();
-
 		const user = new User({ createdAt, updatedAt, id, name, email, password });
-
 		return user;
 	}
 }

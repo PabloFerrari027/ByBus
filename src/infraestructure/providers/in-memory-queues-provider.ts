@@ -42,13 +42,8 @@ export class Queue extends IQeue {
 		this.items.push(queueItem);
 	}
 
-	async publish(data: any): Promise<void> {
-		await Promise.all(
-			this.items.map(async (item, index) => {
-				await item.listen(data);
-				this.items.splice(index, 1);
-			}),
-		);
+	async publish(key: string, data: any): Promise<void> {
+		Promise.all(this.items.filter(q => q.key === key).map(async item => await item.listen(data)));
 	}
 }
 
@@ -58,10 +53,6 @@ export class InMemoryQueuesProvider extends IQueuesProvider {
 	constructor() {
 		super();
 		this.queues = [];
-	}
-
-	async connect(): Promise<void> {
-		return;
 	}
 
 	async create(key: string): Promise<Queue> {

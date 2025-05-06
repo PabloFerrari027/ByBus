@@ -1,14 +1,14 @@
-import { Props } from '../entities/user.js';
 import { UUID } from '../value-objects/UUID.js';
 import { Event } from './event.js';
 
 type Data = {
 	userId: UUID;
-	updatedPropertie: keyof Props;
 };
 
-export class UpdatedUserEvent extends Event<Data> {
+export class NameChangeEvent extends Event<Data> {
 	private readonly _data: Data;
+	static _key = 'name-change-event';
+	private readonly _k = 'name-change-event';
 
 	constructor(data: Data) {
 		super();
@@ -17,5 +17,13 @@ export class UpdatedUserEvent extends Event<Data> {
 
 	get data(): Data {
 		return this._data;
+	}
+
+	static get key() {
+		return this._key;
+	}
+
+	get key() {
+		return this._k;
 	}
 }
