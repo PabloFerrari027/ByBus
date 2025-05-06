@@ -10,7 +10,7 @@ export interface Input {
 }
 export type Right = { user: Optional<JSON, 'password'> };
 
-export class FindUserByIdUseCase extends UseCase<Right> {
+export class FindUserByIdUseCase extends UseCase<Right, Input> {
 	private user: User | null;
 
 	constructor(private readonly usersRepository: UsersRepository) {

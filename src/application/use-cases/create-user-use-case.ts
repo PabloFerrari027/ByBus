@@ -19,7 +19,7 @@ export interface Input {
 
 export type Right = { user: Optional<JSON, 'password'> };
 
-export class CreateUserUseCase extends UseCase<Right> {
+export class CreateUserUseCase extends UseCase<Right, Input> {
 	private user: User | null;
 
 	constructor(
