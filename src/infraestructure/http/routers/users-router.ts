@@ -11,6 +11,9 @@ import { ValidatePasswordResetRequest } from '@/presentation/middlewares/validat
 import { ResetPasswordController } from '@/presentation/controllers/reset-password-controller.js';
 import { ListUsersController } from '@/presentation/controllers/list-users-controller.js';
 import { ValidateUserListing } from '@/presentation/middlewares/validate-user-listing.js';
+import { LoginController } from '@/presentation/controllers/login-controller.js';
+import { ValidateUserLoginRequest } from '@/presentation/middlewares/validate-user-login-request.js';
+import { SessionProvider } from '@/application/ports/providers/session-provider.js';
 
 export class UsersRouter {
 	private _routes: RouteDefinition[];
@@ -18,11 +21,13 @@ export class UsersRouter {
 	constructor(
 		private readonly usersRepository: UsersRepository,
 		private readonly loggerProvider: LoggerProvider,
+		private readonly sessionProvider: SessionProvider,
 	) {
 		this._routes = [];
 		const createUserController = new CreateUserController(
 			this.usersRepository,
 			this.loggerProvider,
+			this.sessionProvider,
 		);
 		const validateUserCreationRequest = new ValidateUserCreationRequest();
 		const findUserByIdController = new FindUserByIdController(this.usersRepository);
@@ -36,6 +41,12 @@ export class UsersRouter {
 		const validatePasswordResetRequest = new ValidatePasswordResetRequest();
 		const listUsersController = new ListUsersController(this.usersRepository);
 		const validateUserListing = new ValidateUserListing();
+		const loginController = new LoginController(
+			this.usersRepository,
+			this.sessionProvider,
+			this.loggerProvider,
+		);
+		const validateUserLoginRequest = new ValidateUserLoginRequest();
 
 		this._routes.push({
 			method: 'post',
@@ -43,7 +54,12 @@ export class UsersRouter {
 			handler: createUserController,
 			middlewares: [validateUserCreationRequest],
 		});
-
+		this._routes.push({
+			method: 'post',
+			path: '/users/login',
+			handler: loginController,
+			middlewares: [validateUserLoginRequest],
+		});
 		this._routes.push({
 			method: 'put',
 			path: '/users/reset/password',

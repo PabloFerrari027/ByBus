@@ -5,6 +5,11 @@ export class UUID {
 		this.value = value;
 	}
 
+	compare(uuid: string | UUID): boolean {
+		if (typeof uuid === 'string') return uuid === this.value;
+		return this.value === uuid.value;
+	}
+
 	static generate(): string {
 		return crypto.randomUUID();
 	}

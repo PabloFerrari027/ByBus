@@ -1,5 +1,6 @@
+import { SessionProvider } from '@/application/ports/providers/session-provider.js';
 import { LoggerProvider } from '@/application/ports/providers/logger-provider.js';
-import { JSON, User } from '@/domain/entities/user.js';
+import { JSON as UserJSON, User } from '@/domain/entities/user.js';
 import { right } from '@/shared/types/either.js';
 import { UsersRepository } from '../ports/repositories/users-repository.js';
 import { AlreadyExists } from '@/domain/errors/already-exists.js';
@@ -10,6 +11,8 @@ import { Optional } from '@/shared/types/optional.js';
 import { Password } from '@/domain/value-objects/Password.js';
 import { Name } from '@/domain/value-objects/Name.js';
 import { Email } from '@/domain/value-objects/Email.js';
+import { UUID } from '@/domain/value-objects/UUID.js';
+import { Session, JSON as SessionJSON } from '@/domain/entities/session.js';
 
 export interface Input {
 	name: string;
@@ -17,17 +20,20 @@ export interface Input {
 	password: string;
 }
 
-export type Right = { user: Optional<JSON, 'password'> };
+export type Right = { user: Optional<UserJSON, 'password'>; session: SessionJSON };
 
 export class CreateUserUseCase extends UseCase<Right, Input> {
 	private user: User | null;
+	private session: Session | null;
 
 	constructor(
 		private readonly usersRepository: UsersRepository,
 		private readonly loggerProvider: LoggerProvider,
+		private readonly sessionProvider: SessionProvider,
 	) {
 		super();
 		this.user = null;
+		this.session = null;
 	}
 
 	async execute(input: Input): Output<Right> {
@@ -43,10 +49,16 @@ export class CreateUserUseCase extends UseCase<Right, Input> {
 			throw new AlreadyExists(title, message);
 		}
 
+		const userId = UUID.create();
+
+		this.session = await this.sessionProvider.create(userId.value);
+
 		this.user = User.create({
+			id: userId.value,
 			name: input.name,
 			email: input.email,
 			password: input.password,
+			sessionId: this.session.id,
 		});
 
 		this.user = await this.usersRepository.create(this.user);
@@ -55,6 +67,9 @@ export class CreateUserUseCase extends UseCase<Right, Input> {
 
 		await EventBus.publish(new CreatedUserEvent({ userId: this.user.id }));
 
-		return right({ user: { ...this.user.toJSON(), password: undefined } });
+		return right({
+			user: { ...this.user.toJSON(), password: undefined },
+			session: this.session.toJSON(),
+		});
 	}
 }

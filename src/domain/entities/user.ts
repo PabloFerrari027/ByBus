@@ -10,14 +10,16 @@ export interface Props {
 	name: Name;
 	email: Email;
 	password: Password;
+	sessionId: UUID;
 	createdAt: Date;
 	updatedAt: Date;
 }
 
 export interface ICreate {
-	id?: string;
+	id: string;
 	name: string;
 	email: string;
+	sessionId: UUID;
 	password: string;
 	createdAt?: Date;
 	updatedAt?: Date;
@@ -28,6 +30,7 @@ export interface JSON {
 	name: string;
 	email: string;
 	password: string;
+	session_id: string;
 	created_at: string;
 	updated_at: string;
 }
@@ -57,6 +60,10 @@ export class User {
 
 	get password(): Password {
 		return this.props.password;
+	}
+
+	get sessionId(): UUID {
+		return this.props.sessionId;
 	}
 
 	get createdAt(): Date {
@@ -95,19 +102,21 @@ export class User {
 			email: this.email.value,
 			name: this.name.value,
 			password: this.password.value,
+			session_id: this.sessionId.value,
 			updated_at: this.updatedAt.toJSON(),
 			created_at: this.createdAt.toJSON(),
 		};
 	}
 
 	static create(props: ICreate): User {
+		const id = UUID.create(props.id);
+		const sessionId = props.sessionId;
 		const name = Name.create(props.name);
 		const email = Email.create(props.email);
 		const password = Password.create(Password.hash(props.password));
-		const id = UUID.create(props.id);
 		const createdAt = props.createdAt ?? new Date();
 		const updatedAt = props.updatedAt ?? new Date();
-		const user = new User({ createdAt, updatedAt, id, name, email, password });
+		const user = new User({ createdAt, updatedAt, id, name, email, password, sessionId });
 		return user;
 	}
 }

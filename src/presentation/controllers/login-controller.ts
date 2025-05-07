@@ -1,9 +1,8 @@
 import { LoggerProvider } from '@/application/ports/providers/logger-provider.js';
 import { UsersRepository } from '@/application/ports/repositories/users-repository.js';
-import { CreateUserUseCase } from '@/application/use-cases/create-user-use-case.js';
 import { Controller, Input, Output } from '@/shared/core/http/controller.js';
-import { UserPresenter } from '../presenters/user-presenter.js';
 import { SessionProvider } from '@/application/ports/providers/session-provider.js';
+import { LoginUseCase } from '@/application/use-cases/login-use-case.js';
 
 interface Body {
 	name: string;
@@ -11,32 +10,30 @@ interface Body {
 	password: string;
 }
 
-export class CreateUserController extends Controller {
+export class LoginController extends Controller {
 	constructor(
 		private readonly usersRepository: UsersRepository,
-		private readonly loggerProvider: LoggerProvider,
 		private readonly sessionProvider: SessionProvider,
+		private readonly loggerProvider: LoggerProvider,
 	) {
 		super();
 	}
 
 	async execute(input: Input): Output {
 		const body = input.body as unknown as Body;
-		const name = body.name;
 		const email = body.email;
 		const password = body.password;
-		const query = input.query as Record<string, boolean>;
-		const useCase = new CreateUserUseCase(
+		const useCase = new LoginUseCase(
 			this.usersRepository,
-			this.loggerProvider,
 			this.sessionProvider,
+			this.loggerProvider,
 		);
-		const response = await useCase.hanlde({ email, name, password });
+		const response = await useCase.hanlde({ email, password });
 		const isRight = response.isRight();
 		if (isRight) {
 			const data = {
-				user: UserPresenter.format(response.value.user, query),
-				session: response.value.session,
+				access_token: response.value.session.accessToken.value,
+				refresh_token: response.value.session.refreshToken.value,
 			};
 			return { status: 201, data };
 		} else {

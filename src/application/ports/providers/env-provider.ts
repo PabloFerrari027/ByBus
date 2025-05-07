@@ -8,4 +8,5 @@ export abstract class ENVProvider {
 	abstract get ADMEmail(): string;
 	abstract get ADMEmailPassword(): string;
 	abstract get mongoURLConnection(): string;
+	abstract get JWTSecret(): string;
 }

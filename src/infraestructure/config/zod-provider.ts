@@ -8,6 +8,7 @@ const envSchema = z.object({
 	ADM_EMAIL: z.string(),
 	ADM_EMAIL_PASSWORD: z.string(),
 	MONGO_URL_CONNECTION: z.string(),
+	JWT_SECRET: z.string(),
 });
 
 export class ZodProvider extends ENVProvider {
@@ -48,5 +49,9 @@ export class ZodProvider extends ENVProvider {
 
 	get mongoURLConnection(): string {
 		return this.variables.MONGO_URL_CONNECTION;
+	}
+
+	get JWTSecret(): string {
+		return this.variables.JWT_SECRET;
 	}
 }

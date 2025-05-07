@@ -8,6 +8,11 @@ export class Password {
 		this.value = value;
 	}
 
+	async compare(password: string | Password): Promise<boolean> {
+		if (typeof password === 'string') return await bcrypt.compare(password, this.value);
+		return await this.compare(password.value);
+	}
+
 	static async compare(password1: Password, password2: Password): Promise<boolean> {
 		return await bcrypt.compare(password1.value, password2.value);
 	}

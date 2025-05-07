@@ -1,10 +1,10 @@
-import { createTransport, Transporter } from 'nodemailer';
-import { NotificationStrategy } from './notification-strategy.js';
-import { ENVProvider } from '../ports/providers/env-provider.js';
-import { LoggerProvider } from '../ports/providers/logger-provider.js';
+import { ENVProvider } from '@/application/ports/providers/env-provider.js';
+import { LoggerProvider } from '@/application/ports/providers/logger-provider.js';
+import { NotificationsProvider as INotificationsProvider } from '@/application/ports/providers/notifications-provider.js';
 import { marked } from 'marked';
+import { createTransport, Transporter } from 'nodemailer';
 
-export class EmailNotificationStrategy extends NotificationStrategy {
+export class EmailNotificationsProvider extends INotificationsProvider {
 	private readonly transporter: Transporter;
 
 	constructor(

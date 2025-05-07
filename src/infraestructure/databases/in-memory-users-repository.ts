@@ -11,16 +11,6 @@ export class InMemoryUsersRepository implements UsersRepository {
 
 	constructor() {
 		this.items = [];
-
-		for (let i = 0; i < 2; i++) {
-			this.items.push(
-				User.create({
-					email: `test${i}@gmail.com`,
-					name: 'Pablo',
-					password: '123',
-				}),
-			);
-		}
 	}
 
 	private sort(a: User, b: User, orderBy: keyof User, ordem: 'ASC' | 'DESC'): number {
