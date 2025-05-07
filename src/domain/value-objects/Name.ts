@@ -1,5 +1,5 @@
 import { NotAccptable } from '../errors/not-accptable.js';
-import { Text } from './Text.js';
+import { Text } from './text.js';
 
 export class Name {
 	readonly value: string;

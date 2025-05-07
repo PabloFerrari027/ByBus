@@ -2,10 +2,14 @@ import { UsersRepository } from '@/application/ports/repositories/users-reposito
 import { Controller, Input, Output } from '@/shared/core/http/controller.js';
 import { UserPresenter } from '../presenters/user-presenter.js';
 import { ListUsersUseCase } from '@/application/use-cases/list-users-use-case.js';
+import { LoggerProvider } from '@/application/ports/providers/logger-provider.js';
 
 export class ListUsersController extends Controller {
-	constructor(private readonly usersRepository: UsersRepository) {
-		super();
+	constructor(
+		private readonly usersRepository: UsersRepository,
+		loggerProvider: LoggerProvider,
+	) {
+		super(loggerProvider);
 	}
 
 	async execute(input: Input): Output {
@@ -13,7 +17,7 @@ export class ListUsersController extends Controller {
 		const page = input.query.page;
 		const orderBy = input.query.order_by;
 		const ordem = input.query.ordem;
-		const useCase = new ListUsersUseCase(this.usersRepository);
+		const useCase = new ListUsersUseCase(this.usersRepository, this.loggerProvider);
 		const response = await useCase.hanlde({ ordem, orderBy, page });
 		const isRight = response.isRight();
 		delete query.page;

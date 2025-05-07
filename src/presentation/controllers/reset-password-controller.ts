@@ -12,9 +12,9 @@ interface Body {
 export class ResetPasswordController extends Controller {
 	constructor(
 		private readonly usersRepository: UsersRepository,
-		private readonly loggerProvider: LoggerProvider,
+		loggerProvider: LoggerProvider,
 	) {
-		super();
+		super(loggerProvider);
 	}
 
 	async execute(input: Input): Output {

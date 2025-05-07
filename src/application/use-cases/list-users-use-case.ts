@@ -3,6 +3,7 @@ import { right } from '@/shared/types/either.js';
 import { UsersRepository } from '../ports/repositories/users-repository.js';
 import { UseCase, Output } from '@/shared/core/use-cases/use-case.js';
 import { Optional } from '@/shared/types/optional.js';
+import { LoggerProvider } from '../ports/providers/logger-provider.js';
 
 export interface Input {
 	orderBy?: string;
@@ -13,8 +14,11 @@ export interface Input {
 export type Right = { pages: number; users: Array<Optional<JSON, 'password'>> };
 
 export class ListUsersUseCase extends UseCase<Right, Input> {
-	constructor(private readonly usersRepository: UsersRepository) {
-		super();
+	constructor(
+		private readonly usersRepository: UsersRepository,
+		loggerProvider: LoggerProvider,
+	) {
+		super(loggerProvider);
 	}
 
 	async execute(input: Input): Output<Right> {

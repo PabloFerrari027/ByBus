@@ -20,7 +20,7 @@ export class NodeRouterAdapter implements Router {
 		this.routes.push(...routes);
 	}
 
-	private async processData(req: IncomingMessage): Promise<object> {
+	private async processData(req: IncomingMessage): Promise<Record<string, unknown>> {
 		let body = '';
 		req.on('data', chunk => (body += chunk));
 		await new Promise(resolve => req.on('end', () => resolve(null)));
@@ -57,9 +57,11 @@ export class NodeRouterAdapter implements Router {
 			const body = await this.processData(req);
 			const parsedUrl = parse(req.url || '', true);
 			const query = this.parseQuery(parsedUrl.query);
+			const headers = req.headers;
 			for await (const handler of matched.middlewares || []) {
-				const response = await handler.execute({ body, query });
+				const response = await handler.handle({ body, query, headers });
 				if (response.next) continue;
+				res.statusCode = response.status;
 				res.setHeader('Content-Type', 'application/json');
 				res.end(JSON.stringify(response.data));
 				return;

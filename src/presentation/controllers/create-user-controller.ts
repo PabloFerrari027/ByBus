@@ -14,10 +14,10 @@ interface Body {
 export class CreateUserController extends Controller {
 	constructor(
 		private readonly usersRepository: UsersRepository,
-		private readonly loggerProvider: LoggerProvider,
 		private readonly sessionProvider: SessionProvider,
+		loggerProvider: LoggerProvider,
 	) {
-		super();
+		super(loggerProvider);
 	}
 
 	async execute(input: Input): Output {
@@ -28,8 +28,8 @@ export class CreateUserController extends Controller {
 		const query = input.query as Record<string, boolean>;
 		const useCase = new CreateUserUseCase(
 			this.usersRepository,
-			this.loggerProvider,
 			this.sessionProvider,
+			this.loggerProvider,
 		);
 		const response = await useCase.hanlde({ email, name, password });
 		const isRight = response.isRight();

@@ -8,10 +8,10 @@ import { EventBus } from '@/infraestructure/event-bus/event-bus.js';
 import { CreatedUserEvent } from '@/domain/events/created-user-event.js';
 import { UseCase, Output } from '@/shared/core/use-cases/use-case.js';
 import { Optional } from '@/shared/types/optional.js';
-import { Password } from '@/domain/value-objects/Password.js';
-import { Name } from '@/domain/value-objects/Name.js';
-import { Email } from '@/domain/value-objects/Email.js';
-import { UUID } from '@/domain/value-objects/UUID.js';
+import { Password } from '@/domain/value-objects/password.js';
+import { Name } from '@/domain/value-objects/name.js';
+import { Email } from '@/domain/value-objects/email.js';
+import { UUID } from '@/domain/value-objects/uuid.js';
 import { Session, JSON as SessionJSON } from '@/domain/entities/session.js';
 
 export interface Input {
@@ -28,10 +28,10 @@ export class CreateUserUseCase extends UseCase<Right, Input> {
 
 	constructor(
 		private readonly usersRepository: UsersRepository,
-		private readonly loggerProvider: LoggerProvider,
 		private readonly sessionProvider: SessionProvider,
+		loggerProvider: LoggerProvider,
 	) {
-		super();
+		super(loggerProvider);
 		this.user = null;
 		this.session = null;
 	}

@@ -1,4 +1,4 @@
-import { UUID } from '../value-objects/UUID.js';
+import { UUID } from '../value-objects/uuid.js';
 import { Token } from './token.js';
 
 interface TokenData {
@@ -15,9 +15,9 @@ export interface Props {
 
 export interface JSON {
 	id: string;
-	userId: string;
-	accessToken: string;
-	refreshToken: string;
+	user_id: string;
+	access_token: string;
+	refresh_token: string;
 }
 
 export class Session {
@@ -56,9 +56,9 @@ export class Session {
 	toJSON(): JSON {
 		return {
 			id: this.id.value,
-			userId: this.userId.value,
-			accessToken: this.accessToken.value,
-			refreshToken: this.refreshToken.value,
+			user_id: this.userId.value,
+			access_token: this.accessToken.value,
+			refresh_token: this.refreshToken.value,
 		};
 	}
 }

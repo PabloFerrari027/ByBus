@@ -1,8 +1,8 @@
 import { UsersRepository } from '@/application/ports/repositories/users-repository.js';
 import { User } from '@/domain/entities/user.js';
-import { Email } from '@/domain/value-objects/Email.js';
-import { Name } from '@/domain/value-objects/Name.js';
-import { UUID } from '@/domain/value-objects/UUID.js';
+import { Email } from '@/domain/value-objects/email.js';
+import { Name } from '@/domain/value-objects/name.js';
+import { UUID } from '@/domain/value-objects/uuid.js';
 import { ListingParameters } from '@/shared/types/listing-parameters.js';
 import { ListingResponse } from '@/shared/types/listing-response.js';
 

@@ -25,9 +25,9 @@ export class LoginUseCase extends UseCase<Right, Input> {
 	constructor(
 		private readonly usersRepository: UsersRepository,
 		private readonly sessionProvider: SessionProvider,
-		private readonly loggerProvider: LoggerProvider,
+		loggerProvider: LoggerProvider,
 	) {
-		super();
+		super(loggerProvider);
 		this.user = null;
 		this.session = null;
 	}

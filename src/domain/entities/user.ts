@@ -1,9 +1,9 @@
 import { NameChangeEvent } from '../events/name-change-event.js';
 import { PasswordChangeEvent } from '../events/password-change-event.js';
-import { Email } from '../value-objects/Email.js';
-import { Name } from '../value-objects/Name.js';
-import { Password } from '../value-objects/Password.js';
-import { UUID } from '../value-objects/UUID.js';
+import { Email } from '../value-objects/email.js';
+import { Name } from '../value-objects/name.js';
+import { Password } from '../value-objects/password.js';
+import { UUID } from '../value-objects/uuid.js';
 
 export interface Props {
 	id: UUID;

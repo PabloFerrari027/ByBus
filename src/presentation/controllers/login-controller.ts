@@ -14,9 +14,9 @@ export class LoginController extends Controller {
 	constructor(
 		private readonly usersRepository: UsersRepository,
 		private readonly sessionProvider: SessionProvider,
-		private readonly loggerProvider: LoggerProvider,
+		loggerProvider: LoggerProvider,
 	) {
-		super();
+		super(loggerProvider);
 	}
 
 	async execute(input: Input): Output {

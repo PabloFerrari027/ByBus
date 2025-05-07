@@ -13,7 +13,9 @@ import { ListUsersController } from '@/presentation/controllers/list-users-contr
 import { ValidateUserListing } from '@/presentation/middlewares/validate-user-listing.js';
 import { LoginController } from '@/presentation/controllers/login-controller.js';
 import { ValidateUserLoginRequest } from '@/presentation/middlewares/validate-user-login-request.js';
-import { SessionProvider } from '@/application/ports/providers/session-provider.js';
+import { SessionProvider, TokenData } from '@/application/ports/providers/session-provider.js';
+import { ValidateSession } from '@/presentation/middlewares/validate-session.js';
+import { TokenStrategy } from '@/application/strategies/token-strategy.js';
 
 export class UsersRouter {
 	private _routes: RouteDefinition[];
@@ -22,31 +24,45 @@ export class UsersRouter {
 		private readonly usersRepository: UsersRepository,
 		private readonly loggerProvider: LoggerProvider,
 		private readonly sessionProvider: SessionProvider,
+		private readonly tokenStrategy: TokenStrategy<TokenData>,
 	) {
 		this._routes = [];
 		const createUserController = new CreateUserController(
 			this.usersRepository,
-			this.loggerProvider,
 			this.sessionProvider,
+			this.loggerProvider,
 		);
-		const validateUserCreationRequest = new ValidateUserCreationRequest();
-		const findUserByIdController = new FindUserByIdController(this.usersRepository);
-		const validateUserSearchRequestById = new ValidateUserSearchRequestById();
-		const findUserByEmailController = new FindUserByEmailController(this.usersRepository);
-		const validateUserSearchRequestByEmail = new ValidateUserSearchRequestByEmail();
+		const validateUserCreationRequest = new ValidateUserCreationRequest(this.loggerProvider);
+		const findUserByIdController = new FindUserByIdController(
+			this.usersRepository,
+			this.loggerProvider,
+		);
+		const validateUserSearchRequestById = new ValidateUserSearchRequestById(this.loggerProvider);
+		const findUserByEmailController = new FindUserByEmailController(
+			this.usersRepository,
+			this.loggerProvider,
+		);
+		const validateUserSearchRequestByEmail = new ValidateUserSearchRequestByEmail(
+			this.loggerProvider,
+		);
 		const resetPasswordController = new ResetPasswordController(
 			this.usersRepository,
 			this.loggerProvider,
 		);
-		const validatePasswordResetRequest = new ValidatePasswordResetRequest();
-		const listUsersController = new ListUsersController(this.usersRepository);
-		const validateUserListing = new ValidateUserListing();
+		const validatePasswordResetRequest = new ValidatePasswordResetRequest(this.loggerProvider);
+		const listUsersController = new ListUsersController(this.usersRepository, this.loggerProvider);
+		const validateUserListing = new ValidateUserListing(this.loggerProvider);
 		const loginController = new LoginController(
 			this.usersRepository,
 			this.sessionProvider,
 			this.loggerProvider,
 		);
-		const validateUserLoginRequest = new ValidateUserLoginRequest();
+		const validateUserLoginRequest = new ValidateUserLoginRequest(this.loggerProvider);
+		const validateSession = new ValidateSession(
+			this.tokenStrategy,
+			this.usersRepository,
+			this.loggerProvider,
+		);
 
 		this._routes.push({
 			method: 'post',
@@ -64,26 +80,26 @@ export class UsersRouter {
 			method: 'put',
 			path: '/users/reset/password',
 			handler: resetPasswordController,
-			middlewares: [validatePasswordResetRequest],
+			middlewares: [validateSession, validatePasswordResetRequest],
 		});
 
 		this._routes.push({
 			method: 'get',
 			path: '/users/find/by/id',
 			handler: findUserByIdController,
-			middlewares: [validateUserSearchRequestById],
+			middlewares: [validateSession, validateUserSearchRequestById],
 		});
 		this._routes.push({
 			method: 'get',
 			path: '/users/find/by/email',
 			handler: findUserByEmailController,
-			middlewares: [validateUserSearchRequestByEmail],
+			middlewares: [validateSession, validateUserSearchRequestByEmail],
 		});
 		this._routes.push({
 			method: 'get',
 			path: '/users/list',
 			handler: listUsersController,
-			middlewares: [validateUserListing],
+			middlewares: [validateSession, validateUserListing],
 		});
 	}
 

@@ -5,7 +5,7 @@ import { UsersRepository } from '../ports/repositories/users-repository.js';
 import { EventBus } from '@/infraestructure/event-bus/event-bus.js';
 import { UseCase, Output } from '@/shared/core/use-cases/use-case.js';
 import { Optional } from '@/shared/types/optional.js';
-import { Password } from '@/domain/value-objects/Password.js';
+import { Password } from '@/domain/value-objects/password.js';
 import { NotFound } from '@/domain/errors/not-found.js';
 
 export interface Input {
@@ -20,9 +20,9 @@ export class ResetPasswordUseCase extends UseCase<Right, Input> {
 
 	constructor(
 		private readonly usersRepository: UsersRepository,
-		private readonly loggerProvider: LoggerProvider,
+		loggerProvider: LoggerProvider,
 	) {
-		super();
+		super(loggerProvider);
 		this.user = null;
 	}
 

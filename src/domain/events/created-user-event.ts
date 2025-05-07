@@ -1,4 +1,4 @@
-import { UUID } from '../value-objects/UUID.js';
+import { UUID } from '../value-objects/uuid.js';
 import { Event } from './event.js';
 
 type Data = {

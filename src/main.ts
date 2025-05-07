@@ -29,7 +29,12 @@ const queueManager = new QueueManager(
 	loggerProvider,
 );
 const router = new NodeRouterAdapter();
-const usersRouter = new UsersRouter(usersRepository, loggerProvider, sessionProvider);
+const usersRouter = new UsersRouter(
+	usersRepository,
+	loggerProvider,
+	sessionProvider,
+	tokenStrategy,
+);
 router.register(usersRouter.routes);
 Promise.all([
 	await queueManager.registerAll(),

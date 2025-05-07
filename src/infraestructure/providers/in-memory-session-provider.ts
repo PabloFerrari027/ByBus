@@ -1,7 +1,7 @@
 import { SessionProvider, TokenData } from '@/application/ports/providers/session-provider.js';
 import { TokenStrategy } from '@/application/strategies/token-strategy.js';
 import { Session } from '@/domain/entities/session.js';
-import { UUID } from '@/domain/value-objects/UUID.js';
+import { UUID } from '@/domain/value-objects/uuid.js';
 
 export class InMemorySessionProvider extends SessionProvider {
 	private sessions: Array<Session>;

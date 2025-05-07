@@ -2,16 +2,20 @@ import { UsersRepository } from '@/application/ports/repositories/users-reposito
 import { FindUserByEmailUseCase } from '@/application/use-cases/find-user-by-email-use-case.js';
 import { Controller, Input, Output } from '@/shared/core/http/controller.js';
 import { UserPresenter } from '../presenters/user-presenter.js';
+import { LoggerProvider } from '@/application/ports/providers/logger-provider.js';
 
 export class FindUserByEmailController extends Controller {
-	constructor(private readonly usersRepository: UsersRepository) {
-		super();
+	constructor(
+		private readonly usersRepository: UsersRepository,
+		loggerProvider: LoggerProvider,
+	) {
+		super(loggerProvider);
 	}
 
 	async execute(input: Input): Output {
 		const query = input.query;
 		const email = query.email;
-		const useCase = new FindUserByEmailUseCase(this.usersRepository);
+		const useCase = new FindUserByEmailUseCase(this.usersRepository, this.loggerProvider);
 		const response = await useCase.hanlde({ email });
 		const isRight = response.isRight();
 		let fields = { ...query, email: true };
