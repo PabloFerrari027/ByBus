@@ -9,6 +9,8 @@ import { ValidateUserSearchRequestById } from '@/presentation/middlewares/valida
 import { RouteDefinition } from '@/shared/core/http/router.js';
 import { ValidatePasswordResetRequest } from '@/presentation/middlewares/validate-password-reset-request.js';
 import { ResetPasswordController } from '@/presentation/controllers/reset-password-controller.js';
+import { ListUsersController } from '@/presentation/controllers/list-users-controller.js';
+import { ValidateUserListing } from '@/presentation/middlewares/validate-user-listing.js';
 
 export class UsersRouter {
 	private _routes: RouteDefinition[];
@@ -32,6 +34,8 @@ export class UsersRouter {
 			this.loggerProvider,
 		);
 		const validatePasswordResetRequest = new ValidatePasswordResetRequest();
+		const listUsersController = new ListUsersController(this.usersRepository);
+		const validateUserListing = new ValidateUserListing();
 
 		this._routes.push({
 			method: 'post',
@@ -58,6 +62,12 @@ export class UsersRouter {
 			path: '/users/find/by/email',
 			handler: findUserByEmailController,
 			middlewares: [validateUserSearchRequestByEmail],
+		});
+		this._routes.push({
+			method: 'get',
+			path: '/users/list',
+			handler: listUsersController,
+			middlewares: [validateUserListing],
 		});
 	}
 
