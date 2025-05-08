@@ -24,8 +24,9 @@ export class NotifyPasswordChangeEvent extends Handler {
 		this.user = await this.usersRepository.findById(event.data.userId.value);
 
 		if (!this.user) {
-			this.loggerProvider.error(`User not found when trying to send welcome email`, {
-				userId: event.data.userId,
+			this.loggerProvider.error({
+				message: `User not found when trying to send welcome email`,
+				meta: { userId: event.data.userId },
 			});
 
 			return;
@@ -36,6 +37,10 @@ export class NotifyPasswordChangeEvent extends Handler {
 			userName: this.user.name.value,
 		});
 
-		await this.notificationsProvider.send(this.user.email.value, message.subject, message.body);
+		await this.notificationsProvider.send({
+			to: this.user.email.value,
+			subject: message.subject,
+			body: message.body,
+		});
 	}
 }

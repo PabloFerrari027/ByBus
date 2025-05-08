@@ -11,21 +11,20 @@ export class InMemorySessionProvider extends SessionProvider {
 		this.sessions = [];
 	}
 
-	async create(userId: string): Promise<Session> {
-		const sessionId = UUID.create(UUID.generate());
+	async create(userId: UUID, sessionId: UUID): Promise<Session> {
 		const accessToken = await this.tokenStrategy.create({
-			userId: UUID.create(userId),
+			userId,
 			sessionId,
 		});
 		const refreshToken = await this.tokenStrategy.create({
-			userId: UUID.create(userId),
+			userId,
 			sessionId,
 		});
 		const session = Session.create({
 			id: sessionId,
 			accessToken,
 			refreshToken,
-			userId: UUID.create(userId),
+			userId,
 		});
 		this.sessions.push(session);
 		return session;
@@ -48,7 +47,7 @@ export class InMemorySessionProvider extends SessionProvider {
 		return session;
 	}
 
-	async findById(sessionId: string): Promise<Session | null> {
+	async findById(sessionId: UUID): Promise<Session | null> {
 		return this.sessions.find(s => s.id.compare(sessionId)) ?? null;
 	}
 }

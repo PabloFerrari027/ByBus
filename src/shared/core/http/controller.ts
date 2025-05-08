@@ -34,7 +34,7 @@ export abstract class Controller {
 			} else if (error instanceof InternalServerError) {
 				return { status: 500, data: { errors: [{ title: error.title, message: error.message }] } };
 			} else {
-				await this.loggerProvider.error('Internal server error', { error });
+				await this.loggerProvider.error({ message: 'Internal server error', meta: { error } });
 				const errors = [
 					{
 						title: 'Internal server error',

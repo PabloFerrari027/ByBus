@@ -56,7 +56,7 @@ export abstract class Middleware {
 					data: { errors: [{ title: error.title, message: error.message }] },
 				};
 			} else {
-				await this.loggerProvider.error('Internal server error', { error });
+				await this.loggerProvider.error({ message: 'Internal server error', meta: { error } });
 				const errors = [
 					{
 						title: 'Internal server error',

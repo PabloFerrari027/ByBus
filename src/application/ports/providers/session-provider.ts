@@ -12,8 +12,8 @@ export abstract class SessionProvider {
 	constructor(strategy: TokenStrategy<TokenData>) {
 		this.tokenStrategy = strategy;
 	}
-	abstract create(userId: string): Promise<Session>;
+	abstract create(userId: UUID, sessionId: UUID): Promise<Session>;
 	abstract revalidate(session: Session): Promise<Session>;
 	abstract close(session: Session): Promise<void>;
-	abstract findById(id: string): Promise<Session | null>;
+	abstract findById(id: UUID): Promise<Session | null>;
 }

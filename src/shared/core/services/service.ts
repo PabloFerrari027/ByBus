@@ -19,7 +19,7 @@ export abstract class Service<Right, Input> {
 			if (error instanceof NotAccptable) return left(error);
 			if (error instanceof AlreadyExists) return left(error);
 			if (error instanceof InternalServerError) return left(error);
-			await this.loggerProvider.error('Internal server error', { error });
+			await this.loggerProvider.error({ message: 'Internal server error', meta: { error } });
 			return left(new InternalServerError('Internal server error', `${error}`));
 		}
 	}

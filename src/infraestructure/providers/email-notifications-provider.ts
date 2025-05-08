@@ -1,3 +1,4 @@
+import { NotificationDTO } from '@/application/dtos/notification-dto.js';
 import { ENVProvider } from '@/application/ports/providers/env-provider.js';
 import { LoggerProvider } from '@/application/ports/providers/logger-provider.js';
 import { NotificationsProvider as INotificationsProvider } from '@/application/ports/providers/notifications-provider.js';
@@ -24,19 +25,24 @@ export class EmailNotificationsProvider extends INotificationsProvider {
 		});
 	}
 
-	async send(to: string, subject: string, body: string): Promise<void> {
-		const html = await marked(body);
+	async send(data: NotificationDTO): Promise<void> {
+		const html = await marked(data.body);
 
 		this.transporter.sendMail(
 			{
 				from: this.ENVProvider.ADMEmail,
-				to,
-				subject,
+				to: data.to,
+				subject: data.subject,
 				html,
 			},
 			async (error, info) => {
-				if (error) await this.loggerProvider.error('Error sending email', { error: error.message });
-				if (info) await this.loggerProvider.info('Email sent successfully', { info });
+				if (error)
+					await this.loggerProvider.error({
+						message: 'Error sending email',
+						meta: { error: error.message },
+					});
+				if (info)
+					await this.loggerProvider.info({ message: 'Email sent successfully', meta: { info } });
 			},
 		);
 	}

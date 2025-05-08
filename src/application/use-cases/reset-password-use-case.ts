@@ -38,18 +38,21 @@ export class ResetPasswordUseCase extends UseCase<Right, Input> {
 			return left(error);
 		}
 
-		const oldPassword = this.user.password.value;
+		const oldPassword = this.user.password?.value;
 
 		this.user.changePassword = input.newPassword;
 
-		const newPassword = this.user.password.value;
+		const newPassword = this.user.password?.value;
 
 		this.user = await this.usersRepository.create(this.user);
 
-		await this.loggerProvider.info('User password update', {
-			userId: this.user.id.value,
-			oldPassword,
-			newPassword,
+		await this.loggerProvider.info({
+			message: 'User password update',
+			meta: {
+				userId: this.user.id.value,
+				oldPassword,
+				newPassword,
+			},
 		});
 
 		const events = this.user.pullEvents();

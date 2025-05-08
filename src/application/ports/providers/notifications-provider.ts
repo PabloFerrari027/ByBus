@@ -1,3 +1,5 @@
+import { NotificationDTO } from '@/application/dtos/notification-dto.js';
+
 export abstract class NotificationsProvider {
-	abstract send(to: string, subject: string, body: string): Promise<void>;
+	abstract send(data: NotificationDTO): Promise<void>;
 }

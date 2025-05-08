@@ -1,3 +1,4 @@
+import { LoggerDTO } from '@/application/dtos/logger-dto.js';
 import { ENVProvider } from '@/application/ports/providers/env-provider.js';
 import { LoggerProvider } from '@/application/ports/providers/logger-provider.js';
 import { Collection, MongoClient } from 'mongodb';
@@ -43,15 +44,15 @@ export class MongoLoggerProvider implements LoggerProvider {
 		}
 	}
 
-	async info(message: string, meta?: Record<string, unknown>): Promise<void> {
-		await this.log('info', message, meta);
+	async info(data: LoggerDTO): Promise<void> {
+		await this.log('info', data.message, data.meta);
 	}
 
-	async warn(message: string, meta?: Record<string, unknown>): Promise<void> {
-		await this.log('warn', message, meta);
+	async warn(data: LoggerDTO): Promise<void> {
+		await this.log('warn', data.message, data.meta);
 	}
 
-	async error(message: string, meta?: Record<string, unknown>): Promise<void> {
-		await this.log('error', message, meta);
+	async error(data: LoggerDTO): Promise<void> {
+		await this.log('error', data.message, data.meta);
 	}
 }

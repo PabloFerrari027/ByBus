@@ -1,8 +1,8 @@
 import { ENVProvider } from '@/application/ports/providers/env-provider.js';
-import { TokenStrategy } from './token-strategy.js';
 import jwt from 'jsonwebtoken';
 import { Token } from '@/domain/entities/token.js';
 import { NotAccptable } from '@/domain/errors/not-accptable.js';
+import { TokenStrategy } from '@/application/strategies/token-strategy.js';
 
 export class JWTTokenStrategy<T> extends TokenStrategy<T> {
 	constructor(private readonly ENVProvider: ENVProvider) {

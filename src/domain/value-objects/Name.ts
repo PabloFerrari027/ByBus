@@ -8,6 +8,11 @@ export class Name {
 		this.value = Text.create(value, 'PASCALCASE').value;
 	}
 
+	compare(name: string | Name): boolean {
+		if (typeof name === 'string') return name === this.value;
+		return this.value === name.value;
+	}
+
 	static compare(name1: Name, name2: Name): boolean {
 		return name1.value === name2.value;
 	}

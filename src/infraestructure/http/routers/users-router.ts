@@ -1,9 +1,7 @@
 import { LoggerProvider } from '@/application/ports/providers/logger-provider.js';
 import { FindUserByIdController } from './../../../presentation/controllers/find-user-by-id-controller.js';
 import { UsersRepository } from '@/application/ports/repositories/users-repository.js';
-import { CreateUserController } from '@/presentation/controllers/create-user-controller.js';
 import { FindUserByEmailController } from '@/presentation/controllers/find-user-by-email-controller copy.js';
-import { ValidateUserCreationRequest } from '@/presentation/middlewares/validate-user-creation-request.js';
 import { ValidateUserSearchRequestByEmail } from '@/presentation/middlewares/validate-user-search-request-by-email.js';
 import { ValidateUserSearchRequestById } from '@/presentation/middlewares/validate-user-search-request-by-id.js';
 import { RouteDefinition } from '@/shared/core/http/router.js';
@@ -16,6 +14,7 @@ import { ValidateUserLoginRequest } from '@/presentation/middlewares/validate-us
 import { SessionProvider, TokenData } from '@/application/ports/providers/session-provider.js';
 import { ValidateSession } from '@/presentation/middlewares/validate-session.js';
 import { TokenStrategy } from '@/application/strategies/token-strategy.js';
+import { AuthStrategy } from '@/application/strategies/auth-strategy.js';
 
 export class UsersRouter {
 	private _routes: RouteDefinition[];
@@ -24,15 +23,10 @@ export class UsersRouter {
 		private readonly usersRepository: UsersRepository,
 		private readonly loggerProvider: LoggerProvider,
 		private readonly sessionProvider: SessionProvider,
+		private readonly authStrategies: AuthStrategy[],
 		private readonly tokenStrategy: TokenStrategy<TokenData>,
 	) {
 		this._routes = [];
-		const createUserController = new CreateUserController(
-			this.usersRepository,
-			this.sessionProvider,
-			this.loggerProvider,
-		);
-		const validateUserCreationRequest = new ValidateUserCreationRequest(this.loggerProvider);
 		const findUserByIdController = new FindUserByIdController(
 			this.usersRepository,
 			this.loggerProvider,
@@ -55,6 +49,7 @@ export class UsersRouter {
 		const loginController = new LoginController(
 			this.usersRepository,
 			this.sessionProvider,
+			this.authStrategies,
 			this.loggerProvider,
 		);
 		const validateUserLoginRequest = new ValidateUserLoginRequest(this.loggerProvider);
@@ -64,12 +59,6 @@ export class UsersRouter {
 			this.loggerProvider,
 		);
 
-		this._routes.push({
-			method: 'post',
-			path: '/users/create',
-			handler: createUserController,
-			middlewares: [validateUserCreationRequest],
-		});
 		this._routes.push({
 			method: 'post',
 			path: '/users/login',
@@ -82,7 +71,6 @@ export class UsersRouter {
 			handler: resetPasswordController,
 			middlewares: [validateSession, validatePasswordResetRequest],
 		});
-
 		this._routes.push({
 			method: 'get',
 			path: '/users/find/by/id',

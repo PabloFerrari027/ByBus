@@ -9,18 +9,23 @@ import { MakeENVProvider } from './infraestructure/factories/make-env-provider.j
 import { MakeLoggerProvider } from './infraestructure/factories/make-logger-provider.js';
 import { MakeTamplateRepository } from './infraestructure/factories/make-template-repository.js';
 import { MakeSessionProvider } from './infraestructure/factories/make-session-provider.js';
-import { JWTTokenStrategy } from './application/strategies/jwt-token-strategy.js';
 import { TokenData } from './application/ports/providers/session-provider.js';
+import { JWTTokenStrategy } from './infraestructure/strategies/jwt-token-strategy.js';
+import { CredentialAuthStrategy } from './infraestructure/strategies/credential-auth-strategy.js';
+import { GoogleAuthStrategy } from './infraestructure/strategies/google-auth-strategy.js';
 
 const queuesProvider = MakeQueuesProvider('IN-MEMORY');
 const usersRepository = MakeUsersRepository('IN-MEMORY');
 const ENVProvider = MakeENVProvider('ZOD');
-const loggerProvider = MakeLoggerProvider('CONSOLE', ENVProvider);
-const notificationsProvider = MakeNotificationsProvider('CONSOLE', ENVProvider, loggerProvider);
+const loggerProvider = MakeLoggerProvider('MONGODB', ENVProvider);
+const notificationsProvider = MakeNotificationsProvider('EMAIL', ENVProvider, loggerProvider);
 const templateRepository = MakeTamplateRepository('FILE');
 const tokenStrategy = new JWTTokenStrategy<TokenData>(ENVProvider);
 const sessionProvider = MakeSessionProvider('IN-MEMORY', tokenStrategy);
 const eventBusManager = new EventBusManager(queuesProvider);
+const credentialAuthStrategy = new CredentialAuthStrategy();
+const googleAuthStrategy = new GoogleAuthStrategy(ENVProvider);
+
 const queueManager = new QueueManager(
 	queuesProvider,
 	notificationsProvider,
@@ -33,6 +38,7 @@ const usersRouter = new UsersRouter(
 	usersRepository,
 	loggerProvider,
 	sessionProvider,
+	[credentialAuthStrategy, googleAuthStrategy],
 	tokenStrategy,
 );
 router.register(usersRouter.routes);

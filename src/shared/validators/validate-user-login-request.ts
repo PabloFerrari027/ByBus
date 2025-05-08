@@ -5,8 +5,11 @@ import { ValidateRequest, Output } from '../../shared/core/validators/validate-r
 export class ValidateUserLoginRequest extends ValidateRequest {
 	execute(data: unknown): Output {
 		const schema = z.object({
+			name: z.string(),
 			email: z.string().email(),
-			password: z.string(),
+			auth_provider: z.string(),
+			password: z.string().optional(),
+			auth_token: z.string().optional(),
 		});
 		const response = schema.safeParse(data);
 		const success = response.success;

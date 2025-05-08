@@ -1,5 +1,3 @@
-import { NotificationStrategy } from '@/application/strategies/notification-strategy.js';
-
 export abstract class ENVProvider {
 	abstract get isProduction(): boolean;
 	abstract get isUnitTest(): boolean;
@@ -9,4 +7,5 @@ export abstract class ENVProvider {
 	abstract get ADMEmailPassword(): string;
 	abstract get mongoURLConnection(): string;
 	abstract get JWTSecret(): string;
+	abstract get googleClientId(): string;
 }
