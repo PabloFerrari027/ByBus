@@ -1,5 +1,5 @@
 import { LoggerProvider } from '@/application/ports/providers/logger-provider.js';
-import { TokenData } from '@/application/ports/providers/session-provider.js';
+import { SessionsRepository } from '@/application/ports/repositories/sessions-repository.js';
 import { UsersRepository } from '@/application/ports/repositories/users-repository.js';
 import { TokenStrategy } from '@/application/strategies/token-strategy.js';
 import { Unauthorized } from '@/domain/errors/unauthorized.js';
@@ -8,8 +8,9 @@ import { Middleware, Input, Output } from '@/shared/core/http/middleware.js';
 
 export class ValidateSession extends Middleware {
 	constructor(
-		private readonly tokenStrategy: TokenStrategy<TokenData>,
+		private readonly tokenStrategy: TokenStrategy,
 		private readonly usersRepository: UsersRepository,
+		private readonly sessionsRepository: SessionsRepository,
 		loggerProvider: LoggerProvider,
 	) {
 		super(loggerProvider);
@@ -31,11 +32,9 @@ export class ValidateSession extends Middleware {
 		const checkAccessToken = new CheckAccessToken(
 			this.tokenStrategy,
 			this.usersRepository,
-			this.loggerProvider,
+			this.sessionsRepository,
 		);
 		const response = await checkAccessToken.execute({ accessToken });
-		console.log(response.value);
-
 		if (response.isLeft()) throw response.value;
 		else return { next: true, status: 200 };
 	}

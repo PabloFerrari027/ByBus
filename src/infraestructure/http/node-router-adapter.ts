@@ -67,13 +67,12 @@ export class NodeRouterAdapter implements Router {
 				return;
 			}
 			const response = await matched.handler.handle({ body, query });
+			if (response.redirect) res.writeHead(302, { Location: response.redirect });
 			res.statusCode = response.status;
 			if (response.data) {
 				res.setHeader('Content-Type', 'application/json');
 				res.end(JSON.stringify(response.data));
-			} else {
-				res.end();
-			}
+			} else res.end();
 		} catch (error) {
 			res.statusCode = 400;
 			return res.end(JSON.stringify({ message: 'Invalid JSON' }));

@@ -8,4 +8,6 @@ export abstract class ENVProvider {
 	abstract get mongoURLConnection(): string;
 	abstract get JWTSecret(): string;
 	abstract get googleClientId(): string;
+	abstract get domain(): string;
+	abstract get callbackURL(): string;
 }

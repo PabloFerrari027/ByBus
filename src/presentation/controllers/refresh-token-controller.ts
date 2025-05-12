@@ -2,23 +2,18 @@ import { LoggerProvider } from '@/application/ports/providers/logger-provider.js
 import { UsersRepository } from '@/application/ports/repositories/users-repository.js';
 import { Controller, Input, Output } from '@/shared/core/http/controller.js';
 import { SessionsRepository } from '@/application/ports/repositories/sessions-repository.js';
-import { LoginUseCase } from '@/application/use-cases/login-use-case.js';
-import { AuthStrategy } from '@/application/strategies/auth-strategy.js';
+import { RefreshTokenUseCase } from '@/application/use-cases/refresh-token-use-case.js';
 import { TokenStrategy } from '@/application/strategies/token-strategy.js';
 
 interface Body {
-	name: string;
-	email: string;
-	auth_provider: string;
-	password?: string;
-	auth_token?: string;
+	access_token: string;
+	refresh_token: string;
 }
 
 export class LoginController extends Controller {
 	constructor(
 		private readonly usersRepository: UsersRepository,
 		private readonly sessionsRepository: SessionsRepository,
-		private readonly authStrategies: AuthStrategy[],
 		private readonly tokenStrategy: TokenStrategy,
 		loggerProvider: LoggerProvider,
 	) {
@@ -27,30 +22,18 @@ export class LoginController extends Controller {
 
 	async execute(input: Input): Output {
 		const body = input.body as unknown as Body;
-		const name = body.name;
-		const email = body.email;
-		const password = body.password;
-		const authProvider = body.auth_provider;
-		const authToken = body.auth_token;
-		const useCase = new LoginUseCase(
+		const accessToken = body.access_token;
+		const refreshToken = body.refresh_token;
+		const useCase = new RefreshTokenUseCase(
 			this.usersRepository,
 			this.sessionsRepository,
 			this.tokenStrategy,
-			this.authStrategies,
 			this.loggerProvider,
 		);
-		const response = await useCase.hanlde({ email, password, authProvider, name, authToken });
+		const response = await useCase.hanlde({ accessToken, refreshToken });
 		const isRight = response.isRight();
 		if (isRight) {
-			const user = { ...response.value.user.toJSON(), password: undefined };
-			const session = {
-				...response.value.session.toJSON(),
-				access_token: response.value.accessToken.value,
-			};
-			const data = {
-				user,
-				session,
-			};
+			const data = response.value;
 			return { status: 200, data };
 		} else {
 			throw response.value;

@@ -1,0 +1,5 @@
+{
+    "key": "validate-email",
+    "subject": "✨ Confirme sua conta e comece a viajar com a gente!",
+    "body": "**Olá {{userName}}!**\n\nRecebemos uma solicitação para validar este endereço de email.\nUse o código abaixo para confirmar sua conta na **ByBus**:\n\n🎯 **Seu código de verificação:**\n**`{{code}}`**\n\nDigite esse código no app ou site para concluir o processo de validação.  \nO código é válido por tempo limitado, então aproveite enquanto está ativo! ⏳\n\nSe você não solicitou essa verificação, pode ignorar este e-mail com segurança.\n\nEstamos felizes por ter você com a gente!\n**Equipe ByBus**\n\n🚍 _Sempre prontos para a próxima parada._"
+}

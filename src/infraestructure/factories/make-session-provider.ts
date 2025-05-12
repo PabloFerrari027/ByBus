@@ -1,19 +1,16 @@
-import { SessionProvider, TokenData } from '@/application/ports/providers/session-provider.js';
-import { InMemorySessionProvider } from '../providers/in-memory-session-provider.js';
+import { SessionsRepository } from '@/application/ports/repositories/sessions-repository.js';
+import { InMemorySessionsRepository } from '../providers/in-memory-sessions-repository.js';
 import { TokenStrategy } from '@/application/strategies/token-strategy.js';
 
 type Implementation = 'IN-MEMORY';
 
-let provider: SessionProvider;
+let provider: SessionsRepository;
 
-export function MakeSessionProvider(
-	implementation: Implementation,
-	tokenStrategy: TokenStrategy<TokenData>,
-) {
+export function MakeSessionsRepository(implementation: Implementation) {
 	switch (implementation) {
 		case 'IN-MEMORY':
-			if (provider instanceof InMemorySessionProvider) return provider;
-			provider = new InMemorySessionProvider(tokenStrategy);
+			if (provider instanceof InMemorySessionsRepository) return provider;
+			provider = new InMemorySessionsRepository();
 			break;
 		default:
 			break;

@@ -27,7 +27,7 @@ export class ResetPasswordController extends Controller {
 		const isRight = response.isRight();
 		if (isRight) {
 			const data = UserPresenter.format(response.value.user, query);
-			return { status: 201, data };
+			return { status: 200, data };
 		} else {
 			throw response.value;
 		}

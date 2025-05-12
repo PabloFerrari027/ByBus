@@ -1,6 +1,7 @@
 import { NotAccptable } from '../errors/not-accptable.js';
 import { NameChangeEvent } from '../events/name-change-event.js';
 import { PasswordChangeEvent } from '../events/password-change-event.js';
+import { VerifiedUserEvent } from '../events/verified-user-event.js';
 import { Email } from '../value-objects/email.js';
 import { Name } from '../value-objects/name.js';
 import { Password } from '../value-objects/password.js';
@@ -12,8 +13,8 @@ export interface Props {
 	name: Name;
 	email: Email;
 	password: Password | null;
-	sessionId: UUID;
 	authProvider: AuthProvider;
+	emailVerified: boolean;
 	createdAt: Date;
 	updatedAt: Date;
 }
@@ -22,9 +23,9 @@ export interface ICreate {
 	id: string;
 	name: string;
 	email: string;
-	sessionId: string;
 	password?: string | null;
 	authProvider: AuthProvider;
+	emailVerified: boolean;
 	createdAt?: Date;
 	updatedAt?: Date;
 }
@@ -34,13 +35,13 @@ export interface JSON {
 	name: string;
 	email: string;
 	password: string | null;
-	session_id: string;
 	auth_provider: AuthProvider;
+	email_verified: boolean;
 	created_at: string;
 	updated_at: string;
 }
 
-type Events = Array<PasswordChangeEvent | NameChangeEvent>;
+type Events = Array<PasswordChangeEvent | NameChangeEvent | VerifiedUserEvent>;
 
 export class User {
 	private props: Props;
@@ -68,12 +69,12 @@ export class User {
 		return this.props.password;
 	}
 
-	get sessionId(): UUID {
-		return this.props.sessionId;
-	}
-
 	get authProvider(): AuthProvider {
 		return this.props.authProvider;
+	}
+
+	get emailVerified() {
+		return this.props.emailVerified;
 	}
 
 	get createdAt(): Date {
@@ -112,11 +113,15 @@ export class User {
 			email: this.email.value,
 			name: this.name.value,
 			password: this.password?.value ?? null,
-			session_id: this.sessionId.value,
 			auth_provider: this.authProvider,
+			email_verified: this.emailVerified,
 			updated_at: this.updatedAt.toJSON(),
 			created_at: this.createdAt.toJSON(),
 		};
+	}
+
+	verifiedAccount() {
+		this.props.emailVerified = true;
 	}
 
 	static validateAuthProvider(authProvider: string): void {
@@ -130,10 +135,10 @@ export class User {
 
 	static create(props: ICreate): User {
 		const id = UUID.create(props.id);
-		const sessionId = UUID.create(props.sessionId);
 		const authProvider = props.authProvider;
 		const name = Name.create(props.name);
 		const email = Email.create(props.email);
+		const emailVerified = props.emailVerified;
 		const password = props.password ? Password.create(Password.hash(props.password)) : null;
 		const createdAt = props.createdAt ?? new Date();
 		const updatedAt = props.updatedAt ?? new Date();
@@ -144,7 +149,7 @@ export class User {
 			name,
 			email,
 			password,
-			sessionId,
+			emailVerified,
 			authProvider,
 		});
 		return user;

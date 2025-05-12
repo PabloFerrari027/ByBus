@@ -28,6 +28,11 @@ export class Token<T> {
 		return new Date().getTime() > this.expiresAt.getTime();
 	}
 
+	compare(token: string | Token<T>): boolean {
+		if (typeof token === 'string') return token === this.value;
+		return this.value === token.value;
+	}
+
 	static create<T>(props: Props<T>) {
 		return new Token(props);
 	}

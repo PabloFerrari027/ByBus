@@ -1,23 +1,23 @@
 import { UUID } from '../value-objects/uuid.js';
 import { Token } from './token.js';
 
-interface TokenData {
+export type RefreshToken = Token<{
 	userId: UUID;
 	sessionId: UUID;
-}
+}>;
 
 export interface Props {
 	id: UUID;
 	userId: UUID;
-	accessToken: Token<TokenData>;
-	refreshToken: Token<TokenData>;
+	refreshToken: RefreshToken;
+	closedAt: Date | null;
 }
 
 export interface JSON {
 	id: string;
 	user_id: string;
-	access_token: string;
 	refresh_token: string;
+	closed_at: string | null;
 }
 
 export class Session {
@@ -35,30 +35,32 @@ export class Session {
 		return this.props.userId;
 	}
 
-	get accessToken(): Token<TokenData> {
-		return this.props.accessToken;
-	}
-
-	get refreshToken(): Token<TokenData> {
+	get refreshToken(): RefreshToken {
 		return this.props.refreshToken;
 	}
 
-	revalidate(accessToken: Token<TokenData>, refreshToken: Token<TokenData>): Session {
-		this.props.accessToken = accessToken;
-		this.props.refreshToken = refreshToken;
-		return this;
-	}
-
-	static create(props: Props): Session {
-		return new Session(props);
+	get closedAt(): Date | null {
+		return this.props.closedAt;
 	}
 
 	toJSON(): JSON {
 		return {
 			id: this.id.value,
 			user_id: this.userId.value,
-			access_token: this.accessToken.value,
+			closed_at: this.closedAt ? this.closedAt.toJSON() : null,
 			refresh_token: this.refreshToken.value,
 		};
+	}
+
+	isClosed(): boolean {
+		return !!this.closedAt;
+	}
+
+	close() {
+		this.props.closedAt = new Date();
+	}
+
+	static create(props: Props): Session {
+		return new Session(props);
 	}
 }

@@ -2,6 +2,7 @@ import { LoggerProvider } from '@/application/ports/providers/logger-provider.js
 import { AlreadyExists } from '@/domain/errors/already-exists.js';
 import { InternalServerError } from '@/domain/errors/internal-server-error.js';
 import { NotAccptable } from '@/domain/errors/not-accptable.js';
+import { NotAllowed } from '@/domain/errors/not-allowed.js';
 import { NotFound } from '@/domain/errors/not-found.js';
 import { Unauthorized } from '@/domain/errors/unauthorized.js';
 
@@ -14,6 +15,7 @@ export interface Input {
 export type Output = Promise<{
 	status: number;
 	data?: unknown;
+	redirect?: string;
 }>;
 
 export abstract class Controller {
@@ -33,6 +35,10 @@ export abstract class Controller {
 				return { status: 401, data: { errors: [{ title: error.title, message: error.message }] } };
 			} else if (error instanceof InternalServerError) {
 				return { status: 500, data: { errors: [{ title: error.title, message: error.message }] } };
+			} else if (error instanceof NotAllowed) {
+				return { status: 405, data: { errors: [{ title: error.title, message: error.message }] } };
+			} else if (error instanceof Unauthorized) {
+				return { status: 401, data: { errors: [{ title: error.title, message: error.message }] } };
 			} else {
 				await this.loggerProvider.error({ message: 'Internal server error', meta: { error } });
 				const errors = [

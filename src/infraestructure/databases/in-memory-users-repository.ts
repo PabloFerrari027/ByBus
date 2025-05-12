@@ -49,6 +49,11 @@ export class InMemoryUsersRepository implements UsersRepository {
 		return user;
 	}
 
+	async save(user: User): Promise<User> {
+		this.items = this.items.map(u => (u.id.compare(user.id) ? user : u));
+		return user;
+	}
+
 	async findByEmail(email: string): Promise<User | null> {
 		return this.items.find(user => Email.compare(user.email, Email.create(email))) || null;
 	}

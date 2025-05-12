@@ -7,6 +7,7 @@ import { UseCase, Output } from '@/shared/core/use-cases/use-case.js';
 import { Optional } from '@/shared/types/optional.js';
 import { Password } from '@/domain/value-objects/password.js';
 import { NotFound } from '@/domain/errors/not-found.js';
+import { NotAllowed } from '@/domain/errors/not-allowed.js';
 
 export interface Input {
 	userId: string;
@@ -38,26 +39,23 @@ export class ResetPasswordUseCase extends UseCase<Right, Input> {
 			return left(error);
 		}
 
-		const oldPassword = this.user.password?.value;
+		if (this.user.authProvider !== 'CREDENTIALS') {
+			const title = 'Operation Not Allowed';
+			const message =
+				'password update is not allowed for users authenticated via third-party providers. This action is only suported for accounts using credentials.';
+			const error = new NotAllowed(title, message);
+			return left(error);
+		}
 
 		this.user.changePassword = input.newPassword;
-
-		const newPassword = this.user.password?.value;
-
-		this.user = await this.usersRepository.create(this.user);
+		this.user = await this.usersRepository.save(this.user);
 
 		await this.loggerProvider.info({
 			message: 'User password update',
-			meta: {
-				userId: this.user.id.value,
-				oldPassword,
-				newPassword,
-			},
+			meta: { userId: this.user.id },
 		});
 
-		const events = this.user.pullEvents();
-
-		await Promise.all(events.map(async event => await EventBus.publish(event)));
+		this.user.pullEvents().map(event => EventBus.publish(event));
 
 		return right({ user: { ...this.user.toJSON(), password: undefined } });
 	}

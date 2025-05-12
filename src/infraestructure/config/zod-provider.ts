@@ -10,6 +10,8 @@ const envSchema = z.object({
 	MONGO_URL_CONNECTION: z.string(),
 	JWT_SECRET: z.string(),
 	GOOGLE_CLIENT_ID: z.string(),
+	DOMAIN: z.string(),
+	CALLBACK_URL: z.string(),
 });
 
 export class ZodProvider extends ENVProvider {
@@ -58,5 +60,13 @@ export class ZodProvider extends ENVProvider {
 
 	get googleClientId(): string {
 		return this.variables.GOOGLE_CLIENT_ID;
+	}
+
+	get domain(): string {
+		return this.variables.DOMAIN;
+	}
+
+	get callbackURL(): string {
+		return this.variables.CALLBACK_URL;
 	}
 }

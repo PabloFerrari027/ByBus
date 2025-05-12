@@ -1,7 +1,7 @@
 import { InternalServerError } from '@/domain/errors/internal-server-error.js';
 import { TemplateRepository } from '../ports/repositories/templates-repository.js';
 
-type TemplateKey = 'WELCOME' | 'PASSWORD-CHANGE';
+type TemplateKey = string;
 
 export class NotificationService {
 	constructor(private readonly templateRepo: TemplateRepository) {}

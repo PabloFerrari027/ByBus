@@ -4,12 +4,12 @@ import { Token } from '@/domain/entities/token.js';
 import { NotAccptable } from '@/domain/errors/not-accptable.js';
 import { TokenStrategy } from '@/application/strategies/token-strategy.js';
 
-export class JWTTokenStrategy<T> extends TokenStrategy<T> {
+export class JWTTokenStrategy<T> extends TokenStrategy {
 	constructor(private readonly ENVProvider: ENVProvider) {
 		super();
 	}
 
-	async create(data: T, expiresAt?: Date | null): Promise<Token<T>> {
+	async create<T>(data: T, expiresAt?: Date | null): Promise<Token<T>> {
 		if (expiresAt === undefined) {
 			const date = new Date();
 			date.setMinutes(date.getMinutes() + 60);
@@ -26,7 +26,7 @@ export class JWTTokenStrategy<T> extends TokenStrategy<T> {
 		return token;
 	}
 
-	async decode(token: string): Promise<Token<T>> {
+	async decode<T>(token: string): Promise<Token<T>> {
 		const payload = jwt.decode(token, { json: true }) as jwt.JwtPayload;
 		if (!payload) {
 			const title = 'Invalid token';
