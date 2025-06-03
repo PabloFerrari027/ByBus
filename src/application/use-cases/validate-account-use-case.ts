@@ -3,7 +3,7 @@ import { left, right } from '@/shared/types/either.js';
 import { UsersRepository } from '../ports/repositories/users-repository.js';
 import { LoggerProvider } from '../ports/providers/logger-provider.js';
 import { User } from '@/domain/entities/user.js';
-import { NotAccptable } from '@/domain/errors/not-accptable.js';
+import { NotAcceptable } from '@/domain/errors/not-accptable.js';
 import { EventBus } from '@/infraestructure/event-bus/event-bus.js';
 import { UserVerificationCodeRepository } from '../ports/repositories/user-verification-code-repository.js';
 
@@ -35,7 +35,7 @@ export class ValidateAccountUseCase extends UseCase<Right, Input> {
 		if (!userVerificationCode) {
 			const title = 'Invalid Code';
 			const message = `The authentication code provided is invalid.`;
-			const error = new NotAccptable(title, message);
+			const error = new NotAcceptable(title, message);
 			return left(error);
 		}
 
@@ -45,7 +45,7 @@ export class ValidateAccountUseCase extends UseCase<Right, Input> {
 			const title = 'Code Expired';
 			const message =
 				'Your authentication code has expired. Please log in again to obtain a new code.';
-			return left(new NotAccptable(title, message));
+			return left(new NotAcceptable(title, message));
 		}
 
 		this.user = await this.usersRepository.findById(input.userId);
@@ -53,7 +53,7 @@ export class ValidateAccountUseCase extends UseCase<Right, Input> {
 		if (!this.user) {
 			const title = 'Invalid Code';
 			const message = `The authentication code provided is invalid.`;
-			const error = new NotAccptable(title, message);
+			const error = new NotAcceptable(title, message);
 			return left(error);
 		}
 

@@ -1,4 +1,4 @@
-export class NotAccptable extends Error {
+export class NotAcceptable extends Error {
 	readonly title: string;
 
 	constructor(title: string, message: string) {

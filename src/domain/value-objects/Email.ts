@@ -1,4 +1,4 @@
-import { NotAccptable } from '../errors/not-accptable.js';
+import { NotAcceptable } from '../errors/not-accptable.js';
 
 export class Email {
 	readonly value: string;
@@ -16,7 +16,7 @@ export class Email {
 		if (isEmpy) {
 			const title = 'Invalid email';
 			const message = 'Email is empy';
-			throw new NotAccptable(title, message);
+			throw new NotAcceptable(title, message);
 		}
 	}
 

@@ -1,7 +1,7 @@
 import { LoggerProvider } from '@/application/ports/providers/logger-provider.js';
 import { AlreadyExists } from '@/domain/errors/already-exists.js';
 import { InternalServerError } from '@/domain/errors/internal-server-error.js';
-import { NotAccptable } from '@/domain/errors/not-accptable.js';
+import { NotAcceptable } from '@/domain/errors/not-accptable.js';
 import { NotAllowed } from '@/domain/errors/not-allowed.js';
 import { NotFound } from '@/domain/errors/not-found.js';
 import { Unauthorized } from '@/domain/errors/unauthorized.js';
@@ -32,7 +32,7 @@ export abstract class Middleware {
 					status: 409,
 					data: { errors: [{ title: error.title, message: error.message }] },
 				};
-			} else if (error instanceof NotAccptable) {
+			} else if (error instanceof NotAcceptable) {
 				return {
 					next: false,
 					status: 406,

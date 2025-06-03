@@ -3,7 +3,7 @@ import { SessionsRepository } from '@/application/ports/repositories/sessions-re
 import { UsersRepository } from '@/application/ports/repositories/users-repository.js';
 import { TokenStrategy } from '@/application/strategies/token-strategy.js';
 import { Unauthorized } from '@/domain/errors/unauthorized.js';
-import { CheckAccessToken } from '@/domain/services/check-access-token.js';
+import { CheckAccessTokenService } from '@/domain/services/check-access-token-service.js';
 import { Middleware, Input, Output } from '@/shared/core/http/middleware.js';
 
 export class ValidateSession extends Middleware {
@@ -29,7 +29,7 @@ export class ValidateSession extends Middleware {
 				data: { errors },
 			};
 		}
-		const checkAccessToken = new CheckAccessToken(
+		const checkAccessToken = new CheckAccessTokenService(
 			this.tokenStrategy,
 			this.usersRepository,
 			this.sessionsRepository,

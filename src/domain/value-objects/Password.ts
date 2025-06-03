@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import { NotAccptable } from '../errors/not-accptable.js';
+import { NotAcceptable } from '../errors/not-accptable.js';
 
 export class Password {
 	readonly value: string;
@@ -26,7 +26,7 @@ export class Password {
 		if (isEmpy) {
 			const title = 'Invalid password';
 			const message = 'Password is empy';
-			throw new NotAccptable(title, message);
+			throw new NotAcceptable(title, message);
 		}
 	}
 

@@ -15,7 +15,7 @@ interface TokenData {
 	sessionId: UUID;
 }
 
-export class CheckAccessToken {
+export class CheckAccessTokenService {
 	constructor(
 		private readonly tokenStrategy: TokenStrategy,
 		private readonly usersRepository: UsersRepository,

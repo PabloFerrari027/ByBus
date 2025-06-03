@@ -1,8 +1,11 @@
+import { Password } from '../value-objects/password.js';
 import { UUID } from '../value-objects/uuid.js';
 import { Event } from './event.js';
 
 type Data = {
 	userId: UUID;
+	oldPassword: Password;
+	newPassword: Password;
 };
 
 export class PasswordChangeEvent extends Event<Data> {

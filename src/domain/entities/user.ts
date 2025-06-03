@@ -1,6 +1,8 @@
-import { NotAccptable } from '../errors/not-accptable.js';
+import { NotAcceptable } from '../errors/not-accptable.js';
+import { NotAllowed } from '../errors/not-allowed.js';
 import { NameChangeEvent } from '../events/name-change-event.js';
 import { PasswordChangeEvent } from '../events/password-change-event.js';
+import { RoleChangedEvent } from '../events/role-changed-event.js';
 import { VerifiedUserEvent } from '../events/verified-user-event.js';
 import { Email } from '../value-objects/email.js';
 import { Name } from '../value-objects/name.js';
@@ -8,11 +10,15 @@ import { Password } from '../value-objects/password.js';
 import { UUID } from '../value-objects/uuid.js';
 
 export type AuthProvider = 'CREDENTIALS' | 'GOOGLE';
+
+export type UserRole = 'ADMIN' | 'DRIVER' | 'CLIENT';
+
 export interface Props {
 	id: UUID;
 	name: Name;
 	email: Email;
 	password: Password | null;
+	role: UserRole;
 	authProvider: AuthProvider;
 	emailVerified: boolean;
 	createdAt: Date;
@@ -23,6 +29,7 @@ export interface ICreate {
 	id: string;
 	name: string;
 	email: string;
+	role: UserRole;
 	password?: string | null;
 	authProvider: AuthProvider;
 	emailVerified: boolean;
@@ -34,6 +41,7 @@ export interface JSON {
 	id: string;
 	name: string;
 	email: string;
+	role: UserRole;
 	password: string | null;
 	auth_provider: AuthProvider;
 	email_verified: boolean;
@@ -41,7 +49,7 @@ export interface JSON {
 	updated_at: string;
 }
 
-type Events = Array<PasswordChangeEvent | NameChangeEvent | VerifiedUserEvent>;
+type Events = Array<PasswordChangeEvent | NameChangeEvent | VerifiedUserEvent | RoleChangedEvent>;
 
 export class User {
 	private props: Props;
@@ -69,6 +77,10 @@ export class User {
 		return this.props.password;
 	}
 
+	get role(): UserRole {
+		return this.props.role;
+	}
+
 	get authProvider(): AuthProvider {
 		return this.props.authProvider;
 	}
@@ -86,14 +98,40 @@ export class User {
 	}
 
 	set rename(value: string) {
-		this.props.name = Name.create(value);
-		this.events.push(new NameChangeEvent({ userId: this.id }));
+		const isSame = this.name.compare(value);
+		if (isSame) return;
+		const oldName = this.name;
+		const newName = Name.create(value);
+		this.props.name = newName;
+		this.events.push(new NameChangeEvent({ userId: this.id, newName, oldName }));
 		this.touch();
 	}
 
 	set changePassword(value: string) {
-		this.props.password = Password.create(Password.hash(value));
-		this.events.push(new PasswordChangeEvent({ userId: this.id }));
+		if (this.authProvider !== 'CREDENTIALS') {
+			const title = 'Password Change Not Allowed';
+			const message = 'Password can only be changed for users authenticated with credentials.';
+			throw new NotAllowed(title, message);
+		}
+		const oldPassword = this.password as Password;
+		const newPassword = Password.create(Password.hash(value));
+		this.props.password = newPassword;
+		this.events.push(new PasswordChangeEvent({ userId: this.id, newPassword, oldPassword }));
+		this.touch();
+	}
+
+	set changeRoleToDriver(_: void) {
+		if (this.props.role === 'DRIVER') return;
+		this.props.role = 'DRIVER';
+		this.events.push(
+			new RoleChangedEvent({ userId: this.id, newRole: 'DRIVER', oldRole: 'CLIENT' }),
+		);
+		this.touch();
+	}
+
+	set markEmailAsVerified(_: void) {
+		this.props.emailVerified = true;
+		this.events.push(new VerifiedUserEvent({ userId: this.id }));
 		this.touch();
 	}
 
@@ -112,6 +150,7 @@ export class User {
 			id: this.id.value,
 			email: this.email.value,
 			name: this.name.value,
+			role: this.role,
 			password: this.password?.value ?? null,
 			auth_provider: this.authProvider,
 			email_verified: this.emailVerified,
@@ -120,17 +159,13 @@ export class User {
 		};
 	}
 
-	verifiedAccount() {
-		this.props.emailVerified = true;
-	}
-
 	static validateAuthProvider(authProvider: string): void {
 		const includes = this.authProviderPossibilities.includes(authProvider as AuthProvider);
 		if (includes) return;
 		const title = 'Invalid authentication provider';
 		const message =
 			'The specified authentication provider is not supported. Please verify the provider and try again.';
-		throw new NotAccptable(title, message);
+		throw new NotAcceptable(title, message);
 	}
 
 	static create(props: ICreate): User {
@@ -138,6 +173,7 @@ export class User {
 		const authProvider = props.authProvider;
 		const name = Name.create(props.name);
 		const email = Email.create(props.email);
+		const role = props.role;
 		const emailVerified = props.emailVerified;
 		const password = props.password ? Password.create(Password.hash(props.password)) : null;
 		const createdAt = props.createdAt ?? new Date();
@@ -149,6 +185,7 @@ export class User {
 			name,
 			email,
 			password,
+			role,
 			emailVerified,
 			authProvider,
 		});

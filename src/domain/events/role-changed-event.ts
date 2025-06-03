@@ -1,14 +1,17 @@
+import { UserRole } from '../entities/user.js';
 import { UUID } from '../value-objects/uuid.js';
 import { Event } from './event.js';
 
 type Data = {
 	userId: UUID;
+	oldRole: UserRole;
+	newRole: UserRole;
 };
 
-export class LoginEvent extends Event<Data> {
+export class RoleChangedEvent extends Event<Data> {
 	private readonly _data: Data;
-	static _key = 'login-event';
-	private readonly _k = 'login-event';
+	static _key = 'role-changed-event';
+	private readonly _k = 'role-changed-event';
 
 	constructor(data: Data) {
 		super();

@@ -1,17 +1,15 @@
-import { Name } from '../value-objects/name.js';
 import { UUID } from '../value-objects/uuid.js';
 import { Event } from './event.js';
 
 type Data = {
 	userId: UUID;
-	oldName: Name;
-	newName: Name;
+	sessionId: UUID;
 };
 
-export class NameChangeEvent extends Event<Data> {
+export class CreatedSessionEvent extends Event<Data> {
 	private readonly _data: Data;
-	static _key = 'name-change-event';
-	private readonly _k = 'name-change-event';
+	static _key = 'created-session-event';
+	private readonly _k = 'created-session-event';
 
 	constructor(data: Data) {
 		super();

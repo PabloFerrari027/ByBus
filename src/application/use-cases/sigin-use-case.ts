@@ -11,8 +11,9 @@ import { TokenStrategy } from '../strategies/token-strategy.js';
 import { NotAcceptable } from '@/domain/errors/not-accptable.js';
 import { Token } from '@/domain/entities/token.js';
 import { CreateSessionService } from '@/domain/services/create-session-service.js';
-import { NotFound } from '@/domain/errors/not-found.js';
 import { EventBus } from '@/infraestructure/event-bus/event-bus.js';
+import { CreatedUserEvent } from '@/domain/events/created-user-event.js';
+import { AlreadyExists } from '@/domain/errors/already-exists.js';
 import { CreatedSessionEvent } from '@/domain/events/created-session-event.js';
 
 interface Right {
@@ -29,7 +30,7 @@ interface Input {
 	authToken?: string;
 }
 
-export class LoginUseCase extends UseCase<Right, Input> {
+export class SiginUseCase extends UseCase<Right, Input> {
 	private user: User | null;
 	private session: Session | null;
 
@@ -67,11 +68,29 @@ export class LoginUseCase extends UseCase<Right, Input> {
 
 		this.user = await this.usersRepository.findByEmail(input.email);
 
-		if (!this.user) {
-			const title = 'User Not Found';
-			const message = 'No user was found with the provided user ID.';
-			return left(new NotFound(title, message));
+		if (this.user) {
+			const title = 'User Already Exists';
+			const message =
+				'A user with this email address already exists. Please sign in or use a different email.';
+			return left(new AlreadyExists(title, message));
 		}
+
+		this.user = await this.usersRepository.create(
+			User.create({
+				id: UUID.generate(),
+				authProvider,
+				email: input.email,
+				emailVerified: input.authProvider !== 'CREDENTIALS',
+				role: 'CLIENT',
+				name: input.name,
+				password: input.password,
+			}),
+		);
+
+		await this.loggerProvider.info({
+			message: 'Created User',
+			meta: { userId: this.user.id.value },
+		});
 
 		const createSessionService = new CreateSessionService(
 			this.sessionsRepository,
@@ -96,6 +115,7 @@ export class LoginUseCase extends UseCase<Right, Input> {
 			expiresAt,
 		);
 
+		EventBus.publish(new CreatedUserEvent({ userId: this.user.id }));
 		EventBus.publish(new CreatedSessionEvent({ userId: this.user.id, sessionId: this.session.id }));
 
 		return right({ session: this.session, user: this.user, accessToken });

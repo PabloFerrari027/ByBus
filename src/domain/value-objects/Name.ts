@@ -1,4 +1,4 @@
-import { NotAccptable } from '../errors/not-accptable.js';
+import { NotAcceptable } from '../errors/not-accptable.js';
 import { Text } from './text.js';
 
 export class Name {
@@ -22,7 +22,7 @@ export class Name {
 		if (isEmpy) {
 			const title = 'Invalid name';
 			const message = 'Name is empy';
-			throw new NotAccptable(title, message);
+			throw new NotAcceptable(title, message);
 		}
 	}
 

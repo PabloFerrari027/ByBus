@@ -1,7 +1,7 @@
 import { ENVProvider } from '@/application/ports/providers/env-provider.js';
 import jwt from 'jsonwebtoken';
 import { Token } from '@/domain/entities/token.js';
-import { NotAccptable } from '@/domain/errors/not-accptable.js';
+import { NotAcceptable } from '@/domain/errors/not-accptable.js';
 import { TokenStrategy } from '@/application/strategies/token-strategy.js';
 
 export class JWTTokenStrategy<T> extends TokenStrategy {
@@ -32,7 +32,7 @@ export class JWTTokenStrategy<T> extends TokenStrategy {
 			const title = 'Invalid token';
 			const message =
 				'The provided authentication token is invalid or malformed. Please log in again to obtain a valid token.';
-			throw new NotAccptable(title, message);
+			throw new NotAcceptable(title, message);
 		}
 		const expiresAt = new Date(payload.exp as number);
 		const data = payload.sub as T;
