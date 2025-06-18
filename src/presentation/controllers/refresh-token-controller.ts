@@ -4,13 +4,14 @@ import { Controller, Input, Output } from '@/shared/core/http/controller.js';
 import { SessionsRepository } from '@/application/ports/repositories/sessions-repository.js';
 import { RefreshTokenUseCase } from '@/application/use-cases/refresh-token-use-case.js';
 import { TokenStrategy } from '@/application/strategies/token-strategy.js';
+import { RefreshTokenMapper } from '../mappers/refresh-token-mapper.js';
 
 interface Body {
 	access_token: string;
 	refresh_token: string;
 }
 
-export class LoginController extends Controller {
+export class RefreshTokenController extends Controller {
 	constructor(
 		private readonly usersRepository: UsersRepository,
 		private readonly sessionsRepository: SessionsRepository,
@@ -22,18 +23,16 @@ export class LoginController extends Controller {
 
 	async execute(input: Input): Output {
 		const body = input.body as unknown as Body;
-		const accessToken = body.access_token;
-		const refreshToken = body.refresh_token;
 		const useCase = new RefreshTokenUseCase(
 			this.usersRepository,
 			this.sessionsRepository,
 			this.tokenStrategy,
 			this.loggerProvider,
 		);
-		const response = await useCase.hanlde({ accessToken, refreshToken });
+		const response = await useCase.handle(RefreshTokenMapper.fromRequest(body));
 		const isRight = response.isRight();
 		if (isRight) {
-			const data = response.value;
+			const data = RefreshTokenMapper.toResponse(response.value);
 			return { status: 200, data };
 		} else {
 			throw response.value;

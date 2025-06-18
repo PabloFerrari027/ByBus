@@ -1,4 +1,4 @@
-import { JSON, User } from '@/domain/entities/user.js';
+import { UserJSON, User } from '@/domain/entities/user.js';
 import { right } from '@/shared/types/either.js';
 import { UsersRepository } from '../ports/repositories/users-repository.js';
 import { UseCase, Output } from '@/shared/core/use-cases/use-case.js';
@@ -11,7 +11,7 @@ export interface Input {
 	page?: number;
 }
 
-export type Right = { pages: number; users: Array<Optional<JSON, 'password'>> };
+export type Right = { pages: number; users: Array<Optional<UserJSON, 'password'>> };
 
 export class ListUsersUseCase extends UseCase<Right, Input> {
 	constructor(

@@ -8,11 +8,11 @@ import { UUID } from '@/domain/value-objects/uuid.js';
 import { User, AuthProvider } from '@/domain/entities/user.js';
 import { AuthStrategy } from '../strategies/auth-strategy.js';
 import { TokenStrategy } from '../strategies/token-strategy.js';
-import { NotAcceptable } from '@/domain/errors/not-accptable.js';
+import { NotAcceptable } from '@/domain/errors/not-acceptable.js';
 import { Token } from '@/domain/entities/token.js';
 import { CreateSessionService } from '@/domain/services/create-session-service.js';
 import { NotFound } from '@/domain/errors/not-found.js';
-import { EventBus } from '@/infraestructure/event-bus/event-bus.js';
+import { EventBus } from '@/infraestructure/event-bus/domain-events.js';
 import { CreatedSessionEvent } from '@/domain/events/created-session-event.js';
 
 interface Right {

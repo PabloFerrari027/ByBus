@@ -8,25 +8,15 @@ type Data = {
 	newName: Name;
 };
 
-export class NameChangeEvent extends Event<Data> {
-	private readonly _data: Data;
-	static _key = 'name-change-event';
-	private readonly _k = 'name-change-event';
+export class NameChangeEvent extends Event {
+	public occurredOn: Date;
 
-	constructor(data: Data) {
+	constructor(
+		public readonly userId: UUID,
+		public readonly oldName: Name,
+		public readonly newName: Name,
+	) {
 		super();
-		this._data = data;
-	}
-
-	get data(): Data {
-		return this._data;
-	}
-
-	static get key() {
-		return this._key;
-	}
-
-	get key() {
-		return this._k;
+		this.occurredOn = new Date();
 	}
 }

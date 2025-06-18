@@ -1,10 +1,17 @@
-import { UUID } from '../value-objects/uuid.js';
+import { UUID, UUIDJSON } from '../value-objects/uuid.js';
 
 export interface Props {
 	value: number;
 	userId: UUID;
 	expiresAt: Date;
 	usedAt: Date | null;
+}
+
+export interface UserVerificationCodeJSON {
+	value: number;
+	user_id: UUIDJSON;
+	expires_at: string;
+	used_at: string | null;
 }
 
 export class UserVerificationCode {
@@ -41,6 +48,15 @@ export class UserVerificationCode {
 
 	used() {
 		this.props.usedAt = new Date();
+	}
+
+	toJSON(): UserVerificationCodeJSON {
+		return {
+			user_id: this.props.userId.toJSON(),
+			value: this.props.value,
+			expires_at: this.props.expiresAt.toJSON(),
+			used_at: this.props.usedAt?.toJSON() ?? null,
+		};
 	}
 
 	static create(props: Props): UserVerificationCode {

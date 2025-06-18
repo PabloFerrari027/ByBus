@@ -1,7 +1,7 @@
 import { LoggerProvider } from '@/application/ports/providers/logger-provider.js';
 import { FindUserByIdController } from './../../../presentation/controllers/find-user-by-id-controller.js';
 import { UsersRepository } from '@/application/ports/repositories/users-repository.js';
-import { FindUserByEmailController } from '@/presentation/controllers/find-user-by-email-controller copy.js';
+import { FindUserByEmailController } from '@/presentation/controllers/find-user-by-email-controller.js';
 import { ValidateUserSearchRequestByEmail } from '@/presentation/middlewares/validate-user-search-request-by-email.js';
 import { ValidateUserSearchRequestById } from '@/presentation/middlewares/validate-user-search-request-by-id.js';
 import { RouteDefinition } from '@/shared/core/http/router.js';

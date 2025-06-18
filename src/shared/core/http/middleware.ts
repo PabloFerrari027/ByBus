@@ -1,7 +1,7 @@
 import { LoggerProvider } from '@/application/ports/providers/logger-provider.js';
 import { AlreadyExists } from '@/domain/errors/already-exists.js';
 import { InternalServerError } from '@/domain/errors/internal-server-error.js';
-import { NotAcceptable } from '@/domain/errors/not-accptable.js';
+import { NotAcceptable } from '@/domain/errors/not-acceptable.js';
 import { NotAllowed } from '@/domain/errors/not-allowed.js';
 import { NotFound } from '@/domain/errors/not-found.js';
 import { Unauthorized } from '@/domain/errors/unauthorized.js';

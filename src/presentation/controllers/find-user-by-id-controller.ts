@@ -3,6 +3,7 @@ import { FindUserByIdUseCase } from '@/application/use-cases/find-user-by-id-use
 import { Controller, Input, Output } from '@/shared/core/http/controller.js';
 import { UserPresenter } from '../presenters/user-presenter.js';
 import { LoggerProvider } from '@/application/ports/providers/logger-provider.js';
+import { FindUserByIdMapper } from '../mappers/find-user-by-id-mapper.js';
 
 export class FindUserByIdController extends Controller {
 	constructor(
@@ -14,15 +15,15 @@ export class FindUserByIdController extends Controller {
 
 	async execute(input: Input): Output {
 		const query = input.query;
-		const id = input.query.id;
 		const useCase = new FindUserByIdUseCase(this.usersRepository, this.loggerProvider);
-		const response = await useCase.hanlde({ id });
+		const response = await useCase.handle(FindUserByIdMapper.fromRequest(input.query));
 		const isRight = response.isRight();
 		let fields = { ...query, id: true };
 		if (Object.keys(fields).length === 1) fields = {};
 		if (isRight) {
-			const data = UserPresenter.format(response.value.user, fields);
-			return { status: 200, data };
+			const data = FindUserByIdMapper.toResponse(response.value.user);
+			const filtered = UserPresenter.format(data, fields);
+			return { status: 200, data: filtered };
 		} else {
 			throw response.value;
 		}

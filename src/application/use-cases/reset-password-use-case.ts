@@ -1,8 +1,8 @@
 import { LoggerProvider } from '@/application/ports/providers/logger-provider.js';
-import { JSON, User } from '@/domain/entities/user.js';
+import { UserJSON, User } from '@/domain/entities/user.js';
 import { left, right } from '@/shared/types/either.js';
 import { UsersRepository } from '../ports/repositories/users-repository.js';
-import { EventBus } from '@/infraestructure/event-bus/event-bus.js';
+import { EventBus } from '@/infraestructure/event-bus/domain-events.js';
 import { UseCase, Output } from '@/shared/core/use-cases/use-case.js';
 import { Optional } from '@/shared/types/optional.js';
 import { Password } from '@/domain/value-objects/password.js';
@@ -14,7 +14,7 @@ export interface Input {
 	newPassword: string;
 }
 
-export type Right = { user: Optional<JSON, 'password'> };
+export type Right = { user: Optional<UserJSON, 'password'> };
 
 export class ResetPasswordUseCase extends UseCase<Right, Input> {
 	private user: User | null;
@@ -28,8 +28,6 @@ export class ResetPasswordUseCase extends UseCase<Right, Input> {
 	}
 
 	async execute(input: Input): Output<Right> {
-		Password.validate(input.newPassword);
-
 		this.user = await this.usersRepository.findById(input.userId);
 
 		if (!this.user) {
@@ -47,7 +45,7 @@ export class ResetPasswordUseCase extends UseCase<Right, Input> {
 			return left(error);
 		}
 
-		this.user.changePassword = input.newPassword;
+		await this.user.changePassword(input.newPassword);
 		this.user = await this.usersRepository.save(this.user);
 
 		await this.loggerProvider.info({

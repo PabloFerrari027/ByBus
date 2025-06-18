@@ -5,9 +5,11 @@ import { NotificationsProvider } from '../ports/providers/notifications-provider
 import { NotificationService } from '../services/notification-service.js';
 import { TemplateRepository } from '../ports/repositories/templates-repository.js';
 import { LoggerProvider } from '../ports/providers/logger-provider.js';
-import { LoginEvent } from '@/domain/events/login-event.js';
+import { CreatedSessionEvent } from '@/domain/events/created-session-event.js';
 
-export class NotifyLoginEvent extends Handler {
+interface Input {}
+
+export class SendWelcomeHandler extends Handler {
 	private user: User | null;
 
 	constructor(
@@ -20,7 +22,7 @@ export class NotifyLoginEvent extends Handler {
 		this.user = null;
 	}
 
-	async execute(event: LoginEvent) {
+	async execute(input: Input) {
 		this.user = await this.usersRepository.findById(event.data.userId.value);
 
 		if (!this.user) {

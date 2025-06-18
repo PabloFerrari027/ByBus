@@ -15,7 +15,7 @@ export class InMemoryUserVerificationCodeRepository implements UserVerificationC
 
 	async save(userVerificationCode: UserVerificationCode): Promise<UserVerificationCode> {
 		this.items = this.items.map(i =>
-			i.userId.compare(userVerificationCode.userId) && userVerificationCode.value === i.value
+			i.userId.equals(userVerificationCode.userId) && userVerificationCode.value === i.value
 				? userVerificationCode
 				: i,
 		);
@@ -23,6 +23,6 @@ export class InMemoryUserVerificationCodeRepository implements UserVerificationC
 	}
 
 	async find(value: number, userId: string): Promise<UserVerificationCode | null> {
-		return this.items.find(i => i.userId.compare(userId) && i.value === value) ?? null;
+		return this.items.find(i => i.userId.equals(userId) && i.value === value) ?? null;
 	}
 }

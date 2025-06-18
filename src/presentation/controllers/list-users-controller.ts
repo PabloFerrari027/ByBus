@@ -3,6 +3,7 @@ import { Controller, Input, Output } from '@/shared/core/http/controller.js';
 import { UserPresenter } from '../presenters/user-presenter.js';
 import { ListUsersUseCase } from '@/application/use-cases/list-users-use-case.js';
 import { LoggerProvider } from '@/application/ports/providers/logger-provider.js';
+import { ListUsersMapper } from '../mappers/list-users-mapper.js';
 
 export class ListUsersController extends Controller {
 	constructor(
@@ -14,11 +15,8 @@ export class ListUsersController extends Controller {
 
 	async execute(input: Input): Output {
 		const query = input.query;
-		const page = input.query.page;
-		const orderBy = input.query.order_by;
-		const ordem = input.query.ordem;
 		const useCase = new ListUsersUseCase(this.usersRepository, this.loggerProvider);
-		const response = await useCase.hanlde({ ordem, orderBy, page });
+		const response = await useCase.handle(ListUsersMapper.fromRequest(input.query));
 		const isRight = response.isRight();
 		delete query.page;
 		delete query.order_by;
@@ -26,10 +24,9 @@ export class ListUsersController extends Controller {
 		let fields = { ...query, id: true };
 		if (Object.keys(fields).length === 1) fields = {};
 		if (isRight) {
-			const users = response.value.users.map(user => UserPresenter.format(user, fields));
-			const pages = response.value.pages;
-			const data = { users, pages };
-			return { status: 200, data };
+			const data = ListUsersMapper.toResponse(response.value);
+			const filtered = data.users.map((user: any) => UserPresenter.format(user, fields));
+			return { status: 200, data: filtered };
 		} else {
 			throw response.value;
 		}

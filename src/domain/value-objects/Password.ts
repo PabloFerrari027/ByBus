@@ -1,36 +1,52 @@
 import bcrypt from 'bcrypt';
-import { NotAcceptable } from '../errors/not-accptable.js';
+import { NotAcceptable } from '../errors/not-acceptable.js';
+
+export type PasswordJSON = string;
 
 export class Password {
 	readonly value: string;
 
-	constructor(value: string) {
+	private constructor(value: string) {
 		this.value = value;
 	}
 
-	async compare(password: string | Password): Promise<boolean> {
-		if (typeof password === 'string') return await bcrypt.compare(password, this.value);
-		return await this.compare(password.value);
-	}
-
-	static async compare(password1: Password, password2: Password): Promise<boolean> {
-		return await bcrypt.compare(password1.value, password2.value);
-	}
-
-	static hash(password: string): string {
-		return bcrypt.hashSync(password, 10);
-	}
-
-	static validate(password: string) {
-		const isEmpy = password.trim().length === 0;
-		if (isEmpy) {
-			const title = 'Invalid password';
-			const message = 'Password is empy';
+	static validate(value: string) {
+		if (!value || value.length < 6) {
+			const title = 'Short Password';
+			const message = 'Password must be at least 6 characters long.';
 			throw new NotAcceptable(title, message);
 		}
 	}
 
-	static create(value: string): Password {
-		return new Password(value);
+	static async create(password: string): Promise<Password> {
+		this.validate(password);
+		const hashed = await bcrypt.hash(password, 10);
+		return new Password(hashed);
+	}
+
+	async equals(password: string): Promise<boolean> {
+		return await bcrypt.compare(password, this.value);
+	}
+
+	toJSON(): PasswordJSON {
+		return this.value;
+	}
+
+	static async compare(p1: Password | string, p2: Password | string): Promise<boolean> {
+		if (typeof p1 === 'string' && typeof p2 === 'string') {
+			return p1 === p2;
+		}
+
+		if (typeof p1 === 'string' && p2 instanceof Password) {
+			return await bcrypt.compare(p1, p2.value);
+		}
+
+		if (p1 instanceof Password && typeof p2 === 'string') {
+			return await bcrypt.compare(p2, p1.value);
+		}
+
+		p1 = p1 as Password;
+		p2 = p2 as Password;
+		return p1.value === p2.value;
 	}
 }

@@ -15,6 +15,8 @@ import { ValidateAccountValidationRequest } from '@/presentation/middlewares/val
 import { UserVerificationCodeRepository } from '@/application/ports/repositories/user-verification-code-repository.js';
 import { LogoutController } from '@/presentation/controllers/logout-controller.js';
 import { ValidateLogoutRequest } from '@/presentation/middlewares/validate-logout-request.js';
+import { SigninController } from '@/presentation/controllers/signin-controller.js';
+import { ValidateUserSigninRequest } from '@/presentation/middlewares/validate-user-signin-request.js';
 
 export class AccountRouter {
 	private _routes: RouteDefinition[];
@@ -58,12 +60,26 @@ export class AccountRouter {
 		);
 		const logoutController = new LogoutController(this.sessionsRepository, this.loggerProvider);
 		const validateLogoutRequest = new ValidateLogoutRequest(this.loggerProvider);
+		const signinController = new SigninController(
+			this.usersRepository,
+			this.sessionsRepository,
+			this.authStrategies,
+			this.tokenStrategy,
+			this.loggerProvider,
+		);
+		const validateSigninRequest = new ValidateUserSigninRequest(this.loggerProvider);
 
 		this._routes.push({
 			method: 'post',
 			path: '/account/validate',
 			handler: validateAccountController,
 			middlewares: [validateAccountValidationRequest],
+		});
+		this._routes.push({
+			method: 'post',
+			path: '/account/signin',
+			handler: signinController,
+			middlewares: [validateSigninRequest],
 		});
 		this._routes.push({
 			method: 'post',

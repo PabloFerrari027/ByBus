@@ -1,4 +1,5 @@
-import { UUID } from '../value-objects/uuid.js';
+import { NotAcceptable } from '../errors/not-acceptable.js';
+import { UUID, UUIDJSON } from '../value-objects/uuid.js';
 
 export interface Props {
 	id: UUID;
@@ -9,10 +10,19 @@ export interface Props {
 	startTime: Date;
 }
 
-export class BusTrip {
-	private props: Props;
+export interface BusTripJSON {
+	id: UUIDJSON;
+	driver_id: UUIDJSON;
+	route_id: UUIDJSON;
+	bus_id: UUIDJSON;
+	end_time: string | null;
+	start_time: string;
+}
 
-	constructor(props: Props) {
+export class BusTrip {
+	private readonly props: Props;
+
+	private constructor(props: Props) {
 		this.props = props;
 	}
 
@@ -40,13 +50,33 @@ export class BusTrip {
 		return this.props.startTime;
 	}
 
-	public ended(): boolean {
-		if (!this.endTime) return false;
-		return this.endTime.getTime() < new Date().getTime();
+	get isEnded(): boolean {
+		if (!this.props.endTime) return false;
+		return this.props.endTime.getTime() < new Date().getTime();
 	}
 
-	public active(): boolean {
+	get isActive(): boolean {
 		return !this.endTime;
+	}
+
+	end() {
+		if (this.endTime !== null) {
+			const title = 'Bus Trip Is Already Ended';
+			const message = 'Bus trip is already ended';
+			throw new NotAcceptable(title, message);
+		}
+		this.props.endTime = new Date();
+	}
+
+	toJSON(): BusTripJSON {
+		return {
+			id: this.props.id.toJSON(),
+			bus_id: this.props.busId.toJSON(),
+			driver_id: this.props.driverId.toJSON(),
+			route_id: this.props.routeId.toJSON(),
+			start_time: this.props.startTime.toJSON(),
+			end_time: this.props.endTime ? this.props.endTime.toJSON() : null,
+		};
 	}
 
 	static create(props: Props) {

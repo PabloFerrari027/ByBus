@@ -1,7 +1,7 @@
 import { ENVProvider } from '@/application/ports/providers/env-provider.js';
 import jwt from 'jsonwebtoken';
 import { Token } from '@/domain/entities/token.js';
-import { NotAcceptable } from '@/domain/errors/not-accptable.js';
+import { NotAcceptable } from '@/domain/errors/not-acceptable.js';
 import { TokenStrategy } from '@/application/strategies/token-strategy.js';
 
 export class JWTTokenStrategy<T> extends TokenStrategy {

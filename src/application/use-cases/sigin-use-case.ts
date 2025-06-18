@@ -8,13 +8,16 @@ import { UUID } from '@/domain/value-objects/uuid.js';
 import { User, AuthProvider } from '@/domain/entities/user.js';
 import { AuthStrategy } from '../strategies/auth-strategy.js';
 import { TokenStrategy } from '../strategies/token-strategy.js';
-import { NotAcceptable } from '@/domain/errors/not-accptable.js';
+import { NotAcceptable } from '@/domain/errors/not-acceptable.js';
 import { Token } from '@/domain/entities/token.js';
 import { CreateSessionService } from '@/domain/services/create-session-service.js';
-import { EventBus } from '@/infraestructure/event-bus/event-bus.js';
+import { EventBus } from '@/infraestructure/event-bus/domain-events.js';
 import { CreatedUserEvent } from '@/domain/events/created-user-event.js';
 import { AlreadyExists } from '@/domain/errors/already-exists.js';
 import { CreatedSessionEvent } from '@/domain/events/created-session-event.js';
+import { Email } from '@/domain/value-objects/email.js';
+import { Name } from '@/domain/value-objects/name.js';
+import { Password } from '@/domain/value-objects/password.js';
 
 interface Right {
 	accessToken: Token<{ userId: UUID; sessionId: UUID }>;
@@ -30,7 +33,7 @@ interface Input {
 	authToken?: string;
 }
 
-export class SiginUseCase extends UseCase<Right, Input> {
+export class SigninUseCase extends UseCase<Right, Input> {
 	private user: User | null;
 	private session: Session | null;
 
@@ -75,17 +78,24 @@ export class SiginUseCase extends UseCase<Right, Input> {
 			return left(new AlreadyExists(title, message));
 		}
 
-		this.user = await this.usersRepository.create(
-			User.create({
-				id: UUID.generate(),
-				authProvider,
-				email: input.email,
-				emailVerified: input.authProvider !== 'CREDENTIALS',
-				role: 'CLIENT',
-				name: input.name,
-				password: input.password,
-			}),
-		);
+		const id = UUID.create();
+		const email = Email.create(input.email);
+		const name = Name.create(input.name);
+		const password = await Password.create(input.name);
+
+		this.user = User.create({
+			id,
+			authProvider,
+			email,
+			name,
+			password,
+			emailVerified: authProvider !== 'CREDENTIALS',
+			role: 'CLIENT',
+			createdAt: new Date(),
+			updatedAt: new Date(),
+		});
+
+		this.user = await this.usersRepository.create(this.user);
 
 		await this.loggerProvider.info({
 			message: 'Created User',

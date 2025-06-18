@@ -1,7 +1,7 @@
 import { LoggerProvider } from '@/application/ports/providers/logger-provider.js';
 import { AlreadyExists } from '@/domain/errors/already-exists.js';
 import { InternalServerError } from '@/domain/errors/internal-server-error.js';
-import { NotAcceptable } from '@/domain/errors/not-accptable.js';
+import { NotAcceptable } from '@/domain/errors/not-acceptable.js';
 import { NotAllowed } from '@/domain/errors/not-allowed.js';
 import { NotFound } from '@/domain/errors/not-found.js';
 import { Unauthorized } from '@/domain/errors/unauthorized.js';
@@ -13,7 +13,7 @@ export type Output<Right> = Promise<Either<Left, Right>>;
 export abstract class UseCase<Right, Input> {
 	constructor(protected readonly loggerProvider: LoggerProvider) {}
 	protected abstract execute(input: Input): Output<Right>;
-	public async hanlde(input: Input): Output<Right> {
+	public async handle(input: Input): Output<Right> {
 		try {
 			return await this.execute(input);
 		} catch (error) {

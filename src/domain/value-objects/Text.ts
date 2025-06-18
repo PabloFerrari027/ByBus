@@ -33,7 +33,7 @@ export class Text {
 	}
 
 	private static pascalcase(value: string): string {
-		const chunks = value.trimEnd().trimStart().split(' ') ?? '';
+		const chunks = value.trimEnd().trimStart().split(' ');
 
 		const result = chunks
 			.map(chunk => {
@@ -51,6 +51,15 @@ export class Text {
 			.join(' ');
 
 		return result;
+	}
+
+	static compare(text1: Text | string, text2: Text | string, preserveCase?: boolean): boolean {
+		if (text1 instanceof Text) return text1.equals(text2, preserveCase);
+		if (text2 instanceof Text) return text2.equals(text1, preserveCase);
+
+		if (preserveCase) return text1 === text2;
+
+		return Text.compare(Text.create(text1, 'UPPERCASE'), Text.create(text2, 'UPPERCASE'));
 	}
 
 	static isEmpty(value: string): boolean {
@@ -71,14 +80,9 @@ export class Text {
 				value = this.capitalize(value);
 				break;
 			}
-
 			case 'UPPERCASE': {
 				value = this.uppercase(value);
 				break;
-			}
-
-			default: {
-				throw new Error('Invalid type');
 			}
 		}
 
@@ -98,10 +102,6 @@ export class Text {
 			return Text.create(value.value, this.type).value === this.value;
 		}
 
-		if (typeof value === 'string') {
-			return Text.create(value, this.type).value === this.value;
-		}
-
-		return false;
+		return Text.create(value, this.type).value === this.value;
 	}
 }

@@ -3,6 +3,7 @@ import { UsersRepository } from '@/application/ports/repositories/users-reposito
 import { Controller, Input, Output } from '@/shared/core/http/controller.js';
 import { ValidateAccountUseCase } from '@/application/use-cases/validate-account-use-case.js';
 import { UserVerificationCodeRepository } from '@/application/ports/repositories/user-verification-code-repository.js';
+import { ValidateAccountMapper } from '../mappers/validate-account-mapper.js';
 
 interface Body {
 	code: number;
@@ -20,16 +21,14 @@ export class ValidateAccountController extends Controller {
 
 	async execute(input: Input): Output {
 		const body = input.body as unknown as Body;
-		const code = body.code;
-		const userId = body.user_id;
 		const useCase = new ValidateAccountUseCase(
 			this.usersRepository,
 			this.userVerificationCodeRepository,
 			this.loggerProvider,
 		);
-		const response = await useCase.hanlde({ code, userId });
+		const response = await useCase.handle(ValidateAccountMapper.fromRequest(body));
 		const isRight = response.isRight();
-		if (isRight) return { status: 200, data: null };
+		if (isRight) return { status: 200, data: ValidateAccountMapper.toResponse(response.value) };
 		else throw response.value;
 	}
 }

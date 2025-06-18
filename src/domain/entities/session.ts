@@ -1,5 +1,5 @@
-import { UUID } from '../value-objects/uuid.js';
-import { Token } from './token.js';
+import { UUID, UUIDJSON } from '../value-objects/uuid.js';
+import { Token, TokenJSON } from './token.js';
 
 export type RefreshToken = Token<{
 	userId: UUID;
@@ -13,17 +13,17 @@ export interface Props {
 	closedAt: Date | null;
 }
 
-export interface JSON {
-	id: string;
-	user_id: string;
+export interface SessionJSON {
+	id: UUIDJSON;
+	user_id: UUIDJSON;
 	refresh_token: string;
 	closed_at: string | null;
 }
 
 export class Session {
-	private props: Props;
+	private readonly props: Props;
 
-	constructor(props: Props) {
+	private constructor(props: Props) {
 		this.props = props;
 	}
 
@@ -43,7 +43,7 @@ export class Session {
 		return this.props.closedAt;
 	}
 
-	toJSON(): JSON {
+	toJSON(): SessionJSON {
 		return {
 			id: this.id.value,
 			user_id: this.userId.value,

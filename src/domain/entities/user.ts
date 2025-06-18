@@ -1,13 +1,13 @@
-import { NotAcceptable } from '../errors/not-accptable.js';
+import { NotAcceptable } from '../errors/not-acceptable.js';
 import { NotAllowed } from '../errors/not-allowed.js';
 import { NameChangeEvent } from '../events/name-change-event.js';
 import { PasswordChangeEvent } from '../events/password-change-event.js';
 import { RoleChangedEvent } from '../events/role-changed-event.js';
 import { VerifiedUserEvent } from '../events/verified-user-event.js';
-import { Email } from '../value-objects/email.js';
-import { Name } from '../value-objects/name.js';
-import { Password } from '../value-objects/password.js';
-import { UUID } from '../value-objects/uuid.js';
+import { Email, EmailJSON } from '../value-objects/email.js';
+import { Name, NameJSON } from '../value-objects/name.js';
+import { Password, PasswordJSON } from '../value-objects/password.js';
+import { UUID, UUIDJSON } from '../value-objects/uuid.js';
 
 export type AuthProvider = 'CREDENTIALS' | 'GOOGLE';
 
@@ -25,26 +25,14 @@ export interface Props {
 	updatedAt: Date;
 }
 
-export interface ICreate {
-	id: string;
-	name: string;
-	email: string;
+export interface UserJSON {
+	id: UUIDJSON;
+	name: NameJSON;
+	email: EmailJSON;
 	role: UserRole;
-	password?: string | null;
-	authProvider: AuthProvider;
-	emailVerified: boolean;
-	createdAt?: Date;
-	updatedAt?: Date;
-}
-
-export interface JSON {
-	id: string;
-	name: string;
-	email: string;
-	role: UserRole;
-	password: string | null;
+	password: PasswordJSON | null;
 	auth_provider: AuthProvider;
-	email_verified: boolean;
+	is_email_verified: boolean;
 	created_at: string;
 	updated_at: string;
 }
@@ -55,6 +43,7 @@ export class User {
 	private props: Props;
 	private events: Events;
 	private static authProviderPossibilities: Array<AuthProvider> = ['CREDENTIALS', 'GOOGLE'];
+	private static rolePossibilities: Array<UserRole> = ['ADMIN', 'CLIENT', 'DRIVER'];
 
 	private constructor(props: Props) {
 		this.props = props;
@@ -85,7 +74,7 @@ export class User {
 		return this.props.authProvider;
 	}
 
-	get emailVerified() {
+	get isEmailVerified() {
 		return this.props.emailVerified;
 	}
 
@@ -97,8 +86,8 @@ export class User {
 		return this.props.updatedAt;
 	}
 
-	set rename(value: string) {
-		const isSame = this.name.compare(value);
+	changeName(value: string) {
+		const isSame = this.name.equals(value);
 		if (isSame) return;
 		const oldName = this.name;
 		const newName = Name.create(value);
@@ -107,32 +96,36 @@ export class User {
 		this.touch();
 	}
 
-	set changePassword(value: string) {
+	async changePassword(value: string) {
 		if (this.authProvider !== 'CREDENTIALS') {
 			const title = 'Password Change Not Allowed';
 			const message = 'Password can only be changed for users authenticated with credentials.';
 			throw new NotAllowed(title, message);
 		}
 		const oldPassword = this.password as Password;
-		const newPassword = Password.create(Password.hash(value));
+		const newPassword = await Password.create(value);
 		this.props.password = newPassword;
 		this.events.push(new PasswordChangeEvent({ userId: this.id, newPassword, oldPassword }));
 		this.touch();
 	}
 
-	set changeRoleToDriver(_: void) {
-		if (this.props.role === 'DRIVER') return;
-		this.props.role = 'DRIVER';
-		this.events.push(
-			new RoleChangedEvent({ userId: this.id, newRole: 'DRIVER', oldRole: 'CLIENT' }),
-		);
+	changeRole(newRole: UserRole) {
+		if (newRole === this.props.role) return;
+		const oldRole = this.props.role;
+		this.props.role = newRole;
+		this.events.push(new RoleChangedEvent({ userId: this.id, newRole, oldRole }));
 		this.touch();
 	}
 
-	set markEmailAsVerified(_: void) {
+	markEmailAsVerified() {
 		this.props.emailVerified = true;
 		this.events.push(new VerifiedUserEvent({ userId: this.id }));
 		this.touch();
+	}
+
+	public async verifyPassword(plainPassword: string): Promise<boolean> {
+		if (!this.password) return false;
+		return await this.password.equals(plainPassword);
 	}
 
 	touch() {
@@ -145,18 +138,26 @@ export class User {
 		return events;
 	}
 
-	toJSON(): JSON {
+	toJSON(): UserJSON {
 		return {
-			id: this.id.value,
-			email: this.email.value,
-			name: this.name.value,
+			id: this.id.toJSON(),
+			email: this.email.toJSON(),
+			name: this.name.toJSON(),
 			role: this.role,
-			password: this.password?.value ?? null,
+			password: this.password?.toJSON() ?? null,
 			auth_provider: this.authProvider,
-			email_verified: this.emailVerified,
+			is_email_verified: this.isEmailVerified,
 			updated_at: this.updatedAt.toJSON(),
 			created_at: this.createdAt.toJSON(),
 		};
+	}
+
+	static validateRole(role: string): void {
+		const includes = this.rolePossibilities.includes(role as UserRole);
+		if (includes) return;
+		const title = 'Invalid Role';
+		const message = 'The specified role is not supported. Please verify the role and try again.';
+		throw new NotAcceptable(title, message);
 	}
 
 	static validateAuthProvider(authProvider: string): void {
@@ -168,27 +169,21 @@ export class User {
 		throw new NotAcceptable(title, message);
 	}
 
-	static create(props: ICreate): User {
-		const id = UUID.create(props.id);
-		const authProvider = props.authProvider;
-		const name = Name.create(props.name);
-		const email = Email.create(props.email);
-		const role = props.role;
-		const emailVerified = props.emailVerified;
-		const password = props.password ? Password.create(Password.hash(props.password)) : null;
-		const createdAt = props.createdAt ?? new Date();
-		const updatedAt = props.updatedAt ?? new Date();
+	static create(props: Props): User {
+		this.validateAuthProvider(props.authProvider);
+
 		const user = new User({
-			createdAt,
-			updatedAt,
-			id,
-			name,
-			email,
-			password,
-			role,
-			emailVerified,
-			authProvider,
+			createdAt: props.createdAt,
+			updatedAt: props.updatedAt,
+			id: props.id,
+			name: props.name,
+			email: props.email,
+			password: props.password,
+			role: props.role,
+			emailVerified: props.emailVerified,
+			authProvider: props.authProvider,
 		});
+
 		return user;
 	}
 }

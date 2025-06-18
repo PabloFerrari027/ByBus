@@ -5,6 +5,7 @@ import { SessionsRepository } from '@/application/ports/repositories/sessions-re
 import { LoginUseCase } from '@/application/use-cases/login-use-case.js';
 import { AuthStrategy } from '@/application/strategies/auth-strategy.js';
 import { TokenStrategy } from '@/application/strategies/token-strategy.js';
+import { LoginMapper } from '../mappers/login-mapper.js';
 
 interface Body {
 	name: string;
@@ -27,11 +28,6 @@ export class LoginController extends Controller {
 
 	async execute(input: Input): Output {
 		const body = input.body as unknown as Body;
-		const name = body.name;
-		const email = body.email;
-		const password = body.password;
-		const authProvider = body.auth_provider;
-		const authToken = body.auth_token;
 		const useCase = new LoginUseCase(
 			this.usersRepository,
 			this.sessionsRepository,
@@ -39,18 +35,10 @@ export class LoginController extends Controller {
 			this.authStrategies,
 			this.loggerProvider,
 		);
-		const response = await useCase.hanlde({ email, password, authProvider, name, authToken });
+		const response = await useCase.handle(LoginMapper.fromRequest(body));
 		const isRight = response.isRight();
 		if (isRight) {
-			const user = { ...response.value.user.toJSON(), password: undefined };
-			const session = {
-				...response.value.session.toJSON(),
-				access_token: response.value.accessToken.value,
-			};
-			const data = {
-				user,
-				session,
-			};
+			const data = LoginMapper.toResponse(response.value);
 			return { status: 200, data };
 		} else {
 			throw response.value;

@@ -50,7 +50,7 @@ export class InMemoryUsersRepository implements UsersRepository {
 	}
 
 	async save(user: User): Promise<User> {
-		this.items = this.items.map(u => (u.id.compare(user.id) ? user : u));
+		this.items = this.items.map(u => (u.id.equals(user.id) ? user : u));
 		return user;
 	}
 

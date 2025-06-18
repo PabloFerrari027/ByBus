@@ -1,15 +1,20 @@
-import { Location } from '../value-objects/location.js';
-import { UUID } from '../value-objects/uuid.js';
+import { Location, LocationJSON } from '../value-objects/location.js';
+import { UUID, UUIDJSON } from '../value-objects/uuid.js';
 
 export interface Props {
 	id: UUID;
 	location: Location;
 }
 
-export class BusStop {
-	private props: Props;
+export interface BusStopJSON {
+	id: UUIDJSON;
+	location: LocationJSON;
+}
 
-	constructor(props: Props) {
+export class BusStop {
+	private readonly props: Props;
+
+	private constructor(props: Props) {
 		this.props = props;
 	}
 
@@ -21,11 +26,14 @@ export class BusStop {
 		return this.props.location;
 	}
 
-	public equals(stop: BusStop): boolean {
-		return stop.location.equals(this.location);
+	toJSON(): BusStopJSON {
+		return {
+			id: this.id.toJSON(),
+			location: this.location.toJSON(),
+		};
 	}
 
-	static create(props: Props) {
+	static create(props: Props): BusStop {
 		return new BusStop(props);
 	}
 }

@@ -1,6 +1,5 @@
 import { NodeRouterAdapter } from './infraestructure/http/node-router-adapter.js';
 import { UsersRouter } from './infraestructure/http/routers/users-router.js';
-import { EventBusManager } from './infraestructure/event-bus/event-bus-manager.js';
 import { QueueManager } from './infraestructure/queues/queue-manager.js';
 import { MakeQueuesProvider } from './infraestructure/factories/make-queues-provider.js';
 import { MakeUsersRepository } from './infraestructure/factories/make-users-repositories.js';
@@ -14,19 +13,24 @@ import { CredentialAuthStrategy } from './infraestructure/strategies/credential-
 import { GoogleAuthStrategy } from './infraestructure/strategies/google-auth-strategy.js';
 import { AccountRouter } from './infraestructure/http/routers/account-router.js';
 import { MakeUserVerificationCodeRepository } from './infraestructure/factories/make-use-verification-code-repository.js';
+import { BusRouter } from './infraestructure/http/routers/bus-router.js';
+import { MakeBusRepository } from './infraestructure/factories/make-bus-repository.js';
+import { DomainEventsManager } from './infraestructure/event-bus/domain-events-manager.js';
 
 const queuesProvider = MakeQueuesProvider('IN-MEMORY');
 const usersRepository = MakeUsersRepository('IN-MEMORY');
 const ENVProvider = MakeENVProvider('ZOD');
-const loggerProvider = MakeLoggerProvider('MONGODB', ENVProvider);
+const loggerProvider = MakeLoggerProvider('CONSOLE', ENVProvider);
 const notificationsProvider = MakeNotificationsProvider('EMAIL', ENVProvider, loggerProvider);
 const templateRepository = MakeTamplateRepository('FILE');
 const tokenStrategy = new JWTTokenStrategy(ENVProvider);
 const sessionsRepository = MakeSessionsRepository('IN-MEMORY');
 const userVerificationCodeRepository = MakeUserVerificationCodeRepository('IN-MEMORY');
-const eventBusManager = new EventBusManager(queuesProvider);
 const credentialAuthStrategy = new CredentialAuthStrategy(usersRepository);
 const googleAuthStrategy = new GoogleAuthStrategy(ENVProvider);
+const busRepository = MakeBusRepository('IN-MEMORY');
+
+new DomainEventsManager(queuesProvider);
 
 const queueManager = new QueueManager(
 	queuesProvider,
@@ -38,6 +42,7 @@ const queueManager = new QueueManager(
 	userVerificationCodeRepository,
 	loggerProvider,
 );
+
 const router = new NodeRouterAdapter();
 const usersRouter = new UsersRouter(
 	usersRepository,
@@ -54,10 +59,8 @@ const accountRouter = new AccountRouter(
 	ENVProvider,
 	userVerificationCodeRepository,
 );
+const busRouter = new BusRouter(loggerProvider, busRepository);
 router.register(usersRouter.routes);
 router.register(accountRouter.routes);
-Promise.all([
-	await queueManager.registerAll(),
-	await eventBusManager.registerAll(),
-	await router.listen(),
-]);
+router.register(busRouter.routes);
+Promise.all([queueManager.registerAll(), router.listen()]);

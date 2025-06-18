@@ -2,31 +2,16 @@ import { Password } from '../value-objects/password.js';
 import { UUID } from '../value-objects/uuid.js';
 import { Event } from './event.js';
 
-type Data = {
-	userId: UUID;
-	oldPassword: Password;
-	newPassword: Password;
-};
+export class PasswordChangeEvent extends Event {
+	public occurredOn: Date;
+	public key = 'password-change-event';
 
-export class PasswordChangeEvent extends Event<Data> {
-	private readonly _data: Data;
-	static _key = 'password-change-event';
-	private readonly _k = 'password-change-event';
-
-	constructor(data: Data) {
+	constructor(
+		public readonly userId: UUID,
+		public readonly oldPassword: Password,
+		public readonly newPassword: Password,
+	) {
 		super();
-		this._data = data;
-	}
-
-	get data(): Data {
-		return this._data;
-	}
-
-	static get key(): string {
-		return this._key;
-	}
-
-	get key(): string {
-		return this._k;
+		this.occurredOn = new Date();
 	}
 }

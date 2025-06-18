@@ -32,7 +32,7 @@ export class CheckAccessTokenService {
 
 		if (!user) return left(new Unauthorized());
 
-		if (!user.emailVerified) return left(new Unauthorized());
+		if (!user.isEmailVerified) return left(new Unauthorized());
 
 		const session = await this.sessionsRepository.findById(token.data.sessionId.value);
 

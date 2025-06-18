@@ -4,10 +4,16 @@ export interface Props<T> {
 	data: T;
 }
 
-export class Token<T> {
-	private props: Props<T>;
+export interface TokenJSON<T> {
+	value: string;
+	expires_at: string | null;
+	data: T;
+}
 
-	constructor(props: Props<T>) {
+export class Token<T> {
+	private readonly props: Props<T>;
+
+	private constructor(props: Props<T>) {
 		this.props = props;
 	}
 
@@ -26,6 +32,14 @@ export class Token<T> {
 	get isExpired(): boolean {
 		if (!this.expiresAt) return false;
 		return new Date().getTime() > this.expiresAt.getTime();
+	}
+
+	toJSON(): TokenJSON<T> {
+		return {
+			data: this.props.data,
+			expires_at: this.props.expiresAt?.toJSON() ?? null,
+			value: this.props.value,
+		};
 	}
 
 	compare(token: string | Token<T>): boolean {

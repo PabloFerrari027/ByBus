@@ -8,25 +8,15 @@ type Data = {
 	newRole: UserRole;
 };
 
-export class RoleChangedEvent extends Event<Data> {
-	private readonly _data: Data;
-	static _key = 'role-changed-event';
-	private readonly _k = 'role-changed-event';
+export class RoleChangedEvent extends Event {
+	public occurredOn: Date;
 
-	constructor(data: Data) {
+	constructor(
+		public readonly userId: UUID,
+		public readonly oldRole: UserRole,
+		public readonly newRole: UserRole,
+	) {
 		super();
-		this._data = data;
-	}
-
-	get data(): Data {
-		return this._data;
-	}
-
-	static get key() {
-		return this._key;
-	}
-
-	get key() {
-		return this._k;
+		this.occurredOn = new Date();
 	}
 }

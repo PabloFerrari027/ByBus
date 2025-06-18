@@ -1,4 +1,4 @@
-import { JSON, User } from '@/domain/entities/user.js';
+import { UserJSON, User } from '@/domain/entities/user.js';
 import { left, right } from '@/shared/types/either.js';
 import { UsersRepository } from '../ports/repositories/users-repository.js';
 import { UseCase, Output } from '@/shared/core/use-cases/use-case.js';
@@ -9,7 +9,7 @@ import { LoggerProvider } from '../ports/providers/logger-provider.js';
 export interface Input {
 	id: string;
 }
-export type Right = { user: Optional<JSON, 'password'> };
+export type Right = { user: Optional<UserJSON, 'password'> };
 
 export class FindUserByIdUseCase extends UseCase<Right, Input> {
 	private user: User | null;

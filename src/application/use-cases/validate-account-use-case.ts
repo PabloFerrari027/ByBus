@@ -3,8 +3,8 @@ import { left, right } from '@/shared/types/either.js';
 import { UsersRepository } from '../ports/repositories/users-repository.js';
 import { LoggerProvider } from '../ports/providers/logger-provider.js';
 import { User } from '@/domain/entities/user.js';
-import { NotAcceptable } from '@/domain/errors/not-accptable.js';
-import { EventBus } from '@/infraestructure/event-bus/event-bus.js';
+import { NotAcceptable } from '@/domain/errors/not-acceptable.js';
+import { EventBus } from '@/infraestructure/event-bus/domain-events.js';
 import { UserVerificationCodeRepository } from '../ports/repositories/user-verification-code-repository.js';
 
 interface Input {
@@ -57,7 +57,7 @@ export class ValidateAccountUseCase extends UseCase<Right, Input> {
 			return left(error);
 		}
 
-		this.user.verifiedAccount();
+		this.user.markEmailAsVerified();
 		userVerificationCode.used();
 
 		await this.usersRepository.save(this.user);

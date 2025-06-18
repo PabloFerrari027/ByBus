@@ -1,5 +1,5 @@
-import { Name } from '../value-objects/name.js';
-import { UUID } from '../value-objects/uuid.js';
+import { Name, NameJSON } from '../value-objects/name.js';
+import { UUID, UUIDJSON } from '../value-objects/uuid.js';
 
 export interface Props {
 	id: UUID;
@@ -7,8 +7,14 @@ export interface Props {
 	tripCount: number;
 }
 
+export interface DriverJSON {
+	id: UUIDJSON;
+	name: NameJSON;
+	trip_count: number;
+}
+
 export class Driver {
-	private props: Props;
+	private readonly props: Props;
 
 	private constructor(props: Props) {
 		this.props = props;
@@ -28,6 +34,14 @@ export class Driver {
 
 	public incrementTripCount(): void {
 		this.props.tripCount += 1;
+	}
+
+	toJSON(): DriverJSON {
+		return {
+			id: this.props.id.toJSON(),
+			name: this.props.name.toJSON(),
+			trip_count: this.props.tripCount,
+		};
 	}
 
 	static create(props: Props): Driver {

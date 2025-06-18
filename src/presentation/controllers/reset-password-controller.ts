@@ -3,6 +3,7 @@ import { UsersRepository } from '@/application/ports/repositories/users-reposito
 import { Controller, Input, Output } from '@/shared/core/http/controller.js';
 import { UserPresenter } from '../presenters/user-presenter.js';
 import { ResetPasswordUseCase } from '@/application/use-cases/reset-password-use-case.js';
+import { ResetPasswordMapper } from '../mappers/reset-password-mapper.js';
 
 interface Body {
 	user_id: string;
@@ -18,16 +19,15 @@ export class ResetPasswordController extends Controller {
 	}
 
 	async execute(input: Input): Output {
-		const body = input.body as unknown as Body;
-		const userId = body.user_id;
-		const newPassword = body.new_password;
+		const body = input.body as Body;
 		const query = input.query as Record<string, boolean>;
 		const useCase = new ResetPasswordUseCase(this.usersRepository, this.loggerProvider);
-		const response = await useCase.hanlde({ userId, newPassword });
+		const response = await useCase.handle(ResetPasswordMapper.fromRequest(body));
 		const isRight = response.isRight();
 		if (isRight) {
-			const data = UserPresenter.format(response.value.user, query);
-			return { status: 200, data };
+			const data = ResetPasswordMapper.toResponse(response.value.user);
+			const filtered = UserPresenter.format(data, query);
+			return { status: 200, data: filtered };
 		} else {
 			throw response.value;
 		}

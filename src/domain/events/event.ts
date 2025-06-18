@@ -1,8 +1,3 @@
-export abstract class Event<T> {
-	static _key = 'event';
-	static get key(): string {
-		return this._key;
-	}
-	abstract get data(): T;
-	abstract get key(): string;
+export abstract class Event {
+	abstract readonly occurredOn: Date;
 }
