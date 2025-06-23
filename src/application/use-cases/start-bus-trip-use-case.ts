@@ -78,7 +78,7 @@ export class StartBusTripUseCase extends UseCase<Right, Input> {
 
 		await this.loggerProvider.info({
 			message: 'Bus Trip Started',
-			meta: { tripId: busTrip.id.value, busId: bus.id.value },
+			meta: { tripId: busTrip.id.value },
 		});
 
 		return right({ busTrip });

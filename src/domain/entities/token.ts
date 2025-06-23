@@ -4,11 +4,7 @@ export interface Props<T> {
 	data: T;
 }
 
-export interface TokenJSON<T> {
-	value: string;
-	expires_at: string | null;
-	data: T;
-}
+export type TokenJSON = string;
 
 export class Token<T> {
 	private readonly props: Props<T>;
@@ -34,12 +30,8 @@ export class Token<T> {
 		return new Date().getTime() > this.expiresAt.getTime();
 	}
 
-	toJSON(): TokenJSON<T> {
-		return {
-			data: this.props.data,
-			expires_at: this.props.expiresAt?.toJSON() ?? null,
-			value: this.props.value,
-		};
+	toJSON(): TokenJSON {
+		return this.value;
 	}
 
 	compare(token: string | Token<T>): boolean {

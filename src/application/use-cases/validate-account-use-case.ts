@@ -4,7 +4,6 @@ import { UsersRepository } from '../ports/repositories/users-repository.js';
 import { LoggerProvider } from '../ports/providers/logger-provider.js';
 import { User } from '@/domain/entities/user.js';
 import { NotAcceptable } from '@/domain/errors/not-acceptable.js';
-import { EventBus } from '@/infraestructure/event-bus/domain-events.js';
 import { UserVerificationCodeRepository } from '../ports/repositories/user-verification-code-repository.js';
 
 interface Input {
@@ -64,7 +63,6 @@ export class ValidateAccountUseCase extends UseCase<Right, Input> {
 		await this.userVerificationCodeRepository.save(userVerificationCode);
 
 		this.loggerProvider.info({ message: 'Verified User', meta: { userId: this.user.id } });
-		this.user.pullEvents().map(event => EventBus.publish(event));
 		return right(undefined);
 	}
 }

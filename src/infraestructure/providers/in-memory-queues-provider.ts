@@ -1,22 +1,16 @@
 import { Handler } from '@/shared/core/queues/handler.js';
 import {
-	Queue as IQeue,
+	Queue as IQueue,
 	QueueItem as IQueueItem,
 	QueuesProvider as IQueuesProvider,
 } from '@/application/ports/providers/queues-provider.js';
 
 export class QueueItem extends IQueueItem {
-	private readonly _key: string;
 	private readonly handler: Handler;
 
-	constructor(key: string, handler: Handler) {
+	constructor(handler: Handler) {
 		super();
-		this._key = key;
 		this.handler = handler;
-	}
-
-	get key(): string {
-		return this._key;
 	}
 
 	async listen(data: any): Promise<void> {
@@ -24,7 +18,7 @@ export class QueueItem extends IQueueItem {
 	}
 }
 
-export class Queue extends IQeue {
+export class Queue extends IQueue {
 	private readonly _key: string;
 	private readonly items: Array<QueueItem> = [];
 
@@ -37,13 +31,13 @@ export class Queue extends IQeue {
 		return this._key;
 	}
 
-	subscribe(key: string, handler: Handler): void {
-		const queueItem = new QueueItem(key, handler);
+	subscribe(handler: Handler): void {
+		const queueItem = new QueueItem(handler);
 		this.items.push(queueItem);
 	}
 
-	async publish(key: string, data: any): Promise<void> {
-		Promise.all(this.items.filter(q => q.key === key).map(async item => await item.listen(data)));
+	async publish(data: any): Promise<void> {
+		Promise.all(this.items.map(async item => await item.listen(data)));
 	}
 }
 

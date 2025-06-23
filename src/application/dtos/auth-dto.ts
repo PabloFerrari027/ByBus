@@ -8,8 +8,9 @@ export type CredentialAuthDTO = {
 };
 
 export type GoogleAuthDTO = {
-	method: AuthMethod;
+	name: string;
 	email: string;
+	method: AuthMethod;
 	authToken: string;
 };
 

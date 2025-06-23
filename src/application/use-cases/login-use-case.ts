@@ -12,7 +12,7 @@ import { NotAcceptable } from '@/domain/errors/not-acceptable.js';
 import { Token } from '@/domain/entities/token.js';
 import { CreateSessionService } from '@/domain/services/create-session-service.js';
 import { NotFound } from '@/domain/errors/not-found.js';
-import { EventBus } from '@/infraestructure/event-bus/domain-events.js';
+import { DomainEvents } from '@/infraestructure/event-bus/domain-events.js';
 import { CreatedSessionEvent } from '@/domain/events/created-session-event.js';
 
 interface Right {
@@ -96,7 +96,7 @@ export class LoginUseCase extends UseCase<Right, Input> {
 			expiresAt,
 		);
 
-		EventBus.publish(new CreatedSessionEvent({ userId: this.user.id, sessionId: this.session.id }));
+		await DomainEvents.dispatch([new CreatedSessionEvent(this.user.id, this.session.id)]);
 
 		return right({ session: this.session, user: this.user, accessToken });
 	}

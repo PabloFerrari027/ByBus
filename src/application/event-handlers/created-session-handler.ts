@@ -16,9 +16,6 @@ export class CreatedSessionHandler extends Handler {
 	}
 
 	async execute(event: CreatedSessionEvent) {
-		this.queue = await this.queuesProvider.get('users');
-		if (!this.queue) this.queue = await this.queuesProvider.create('users');
-
 		const user = await this.usersRepository.findById(event.userId.value);
 
 		if (!user) {
@@ -28,12 +25,18 @@ export class CreatedSessionHandler extends Handler {
 		}
 
 		if (user.isEmailVerified) {
-			await this.queue.publish('send-welcome-notification', {
+			this.queue = await this.queuesProvider.get('send-welcome');
+			if (!this.queue) this.queue = await this.queuesProvider.create('send-welcome');
+
+			await this.queue.publish({
 				userId: event.userId,
 				sessionId: event.sessionId,
 			});
 		} else {
-			await this.queue.publish('send-verification-code', {
+			this.queue = await this.queuesProvider.get('send-verification-code');
+			if (!this.queue) this.queue = await this.queuesProvider.create('send-verification-code');
+
+			await this.queue.publish({
 				userId: event.userId,
 				sessionId: event.sessionId,
 			});

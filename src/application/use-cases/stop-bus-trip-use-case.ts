@@ -15,10 +15,9 @@ type Output = Promise<Either<Left, Right>>;
 
 interface Input {
 	tripId: string;
-	userId: string;
 }
 
-export class EndBusTripUseCase extends UseCase<Right, Input> {
+export class StopBusTripUseCase extends UseCase<Right, Input> {
 	constructor(
 		private readonly busTripRepository: BusTripRepository,
 		loggerProvider: LoggerProvider,
@@ -41,7 +40,7 @@ export class EndBusTripUseCase extends UseCase<Right, Input> {
 
 		await this.loggerProvider.info({
 			message: 'Bus Trip Ended',
-			meta: { tripId: busTrip.id.value, userId: input.userId },
+			meta: { tripId: busTrip.id.value },
 		});
 
 		return right({ busTrip });

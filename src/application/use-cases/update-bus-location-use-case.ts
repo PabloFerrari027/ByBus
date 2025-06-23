@@ -15,6 +15,7 @@ type Left = NotFound;
 type Output = Promise<Either<Left, Right>>;
 
 interface Input {
+	userId: string;
 	busId: string;
 	longitude: number;
 	latitude: number;
@@ -38,9 +39,16 @@ export class UpdateBusLocationUseCase extends UseCase<Right, Input> {
 			return left(new NotFound(errorTitle, errorMessage));
 		}
 
+		const oldLocation = bus.location.toJSON();
+
 		bus.updateLocation(location);
 
 		await this.busRepository.save(bus);
+
+		await this.loggerProvider.info({
+			message: 'Bus Location Updated',
+			meta: { userId: input.userId, oldLocation, newLocation: location.toJSON() },
+		});
 
 		return right({ bus });
 	}

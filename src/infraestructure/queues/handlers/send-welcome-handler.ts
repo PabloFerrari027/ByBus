@@ -1,13 +1,16 @@
-import { UsersRepository } from '../ports/repositories/users-repository.js';
-import { Handler } from '../../shared/core/queues/handler.js';
+import { LoggerProvider } from '@/application/ports/providers/logger-provider.js';
+import { NotificationsProvider } from '@/application/ports/providers/notifications-provider.js';
+import { TemplateRepository } from '@/application/ports/repositories/templates-repository.js';
+import { UsersRepository } from '@/application/ports/repositories/users-repository.js';
+import { NotificationService } from '@/application/services/notification-service.js';
 import { User } from '@/domain/entities/user.js';
-import { NotificationsProvider } from '../ports/providers/notifications-provider.js';
-import { NotificationService } from '../services/notification-service.js';
-import { TemplateRepository } from '../ports/repositories/templates-repository.js';
-import { LoggerProvider } from '../ports/providers/logger-provider.js';
-import { CreatedSessionEvent } from '@/domain/events/created-session-event.js';
+import { UUID } from '@/domain/value-objects/uuid.js';
+import { Handler } from '@/shared/core/queues/handler.js';
 
-interface Input {}
+interface Input {
+	userId: UUID;
+	sessionId: UUID;
+}
 
 export class SendWelcomeHandler extends Handler {
 	private user: User | null;
@@ -23,12 +26,12 @@ export class SendWelcomeHandler extends Handler {
 	}
 
 	async execute(input: Input) {
-		this.user = await this.usersRepository.findById(event.data.userId.value);
+		this.user = await this.usersRepository.findById(input.userId.value);
 
 		if (!this.user) {
 			this.loggerProvider.error({
 				message: `User not found when trying to send welcome email`,
-				meta: { userId: event.data.userId },
+				meta: { userId: input.userId.value },
 			});
 			return;
 		}

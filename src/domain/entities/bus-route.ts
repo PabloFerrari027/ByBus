@@ -1,22 +1,21 @@
-import { DomainEvents } from '@/infraestructure/event-bus/domain-events.js';
 import { AlreadyExists } from '../errors/already-exists.js';
 import { NotAcceptable } from '../errors/not-acceptable.js';
-import { BusStopAddedToRouteEvent } from '../events/bus-stop-added-to-route-event.js';
+import { NotFound } from '../errors/not-found.js';
 import { UUID, UUIDJSON } from '../value-objects/uuid.js';
-import { BusStop, BusStopJSON } from './bus-stop.js';
+import { BusRouteStop, BusRouteStopJSON } from './bus-route-stop.js';
 
 export type BusRouteStatus = 'ACTIVE' | 'DEACTIVATED';
 
 export interface Props {
 	id: UUID;
 	status: BusRouteStatus;
-	stops: Array<BusStop>;
+	stops: Array<BusRouteStop>;
 }
 
 export interface BusRouteJSON {
 	id: UUIDJSON;
 	status: BusRouteStatus;
-	stops: Array<BusStopJSON>;
+	stops: Array<BusRouteStopJSON>;
 }
 
 export class BusRoute {
@@ -34,7 +33,7 @@ export class BusRoute {
 		return this.props.status;
 	}
 
-	get stops(): Array<BusStop> {
+	get stops(): Array<BusRouteStop> {
 		return this.props.stops;
 	}
 
@@ -64,8 +63,8 @@ export class BusRoute {
 		this.props.status = 'DEACTIVATED';
 	}
 
-	addStop(stop: BusStop): void {
-		const alreadyExists = this.stops.find(existing => existing.location.equals(stop.location));
+	addStop(stop: BusRouteStop): void {
+		const alreadyExists = this.stops.find(existing => existing.equals(stop));
 
 		if (alreadyExists) {
 			throw new AlreadyExists(
@@ -75,7 +74,10 @@ export class BusRoute {
 		}
 
 		this.stops.push(stop);
-		DomainEvents.dispatch([new BusStopAddedToRouteEvent(this, stop)]);
+	}
+
+	removeStop(stopId: UUID | string) {
+		this.props.stops = this.stops.filter(stop => stop.stopId.equals(stopId));
 	}
 
 	toJSON(): BusRouteJSON {

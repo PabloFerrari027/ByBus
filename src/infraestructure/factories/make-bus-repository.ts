@@ -1,5 +1,5 @@
 import { BusRepository } from '@/application/ports/repositories/bus-repository.js';
-import { InMemoryBusRepository } from '../databases/in-memory-bus-repositories.js';
+import { InMemoryBusRepository } from '../databases/in-memory-bus-repository.js';
 
 type Implementation = 'IN-MEMORY';
 

@@ -2,10 +2,8 @@ import { LoggerProvider } from '@/application/ports/providers/logger-provider.js
 import { UserJSON, User } from '@/domain/entities/user.js';
 import { left, right } from '@/shared/types/either.js';
 import { UsersRepository } from '../ports/repositories/users-repository.js';
-import { EventBus } from '@/infraestructure/event-bus/domain-events.js';
 import { UseCase, Output } from '@/shared/core/use-cases/use-case.js';
 import { Optional } from '@/shared/types/optional.js';
-import { Password } from '@/domain/value-objects/password.js';
 import { NotFound } from '@/domain/errors/not-found.js';
 import { NotAllowed } from '@/domain/errors/not-allowed.js';
 
@@ -52,8 +50,6 @@ export class ResetPasswordUseCase extends UseCase<Right, Input> {
 			message: 'User password update',
 			meta: { userId: this.user.id },
 		});
-
-		this.user.pullEvents().map(event => EventBus.publish(event));
 
 		return right({ user: { ...this.user.toJSON(), password: undefined } });
 	}

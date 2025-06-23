@@ -1,3 +1,4 @@
+import { DomainEvents } from '@/infraestructure/event-bus/domain-events.js';
 import { NotAcceptable } from '../errors/not-acceptable.js';
 import { NotAllowed } from '../errors/not-allowed.js';
 import { NameChangeEvent } from '../events/name-change-event.js';
@@ -41,13 +42,11 @@ type Events = Array<PasswordChangeEvent | NameChangeEvent | VerifiedUserEvent | 
 
 export class User {
 	private props: Props;
-	private events: Events;
 	private static authProviderPossibilities: Array<AuthProvider> = ['CREDENTIALS', 'GOOGLE'];
 	private static rolePossibilities: Array<UserRole> = ['ADMIN', 'CLIENT', 'DRIVER'];
 
 	private constructor(props: Props) {
 		this.props = props;
-		this.events = [];
 	}
 
 	get id(): UUID {
@@ -92,7 +91,7 @@ export class User {
 		const oldName = this.name;
 		const newName = Name.create(value);
 		this.props.name = newName;
-		this.events.push(new NameChangeEvent({ userId: this.id, newName, oldName }));
+		DomainEvents.dispatch([new NameChangeEvent(this.id, newName, oldName)]);
 		this.touch();
 	}
 
@@ -102,10 +101,9 @@ export class User {
 			const message = 'Password can only be changed for users authenticated with credentials.';
 			throw new NotAllowed(title, message);
 		}
-		const oldPassword = this.password as Password;
 		const newPassword = await Password.create(value);
 		this.props.password = newPassword;
-		this.events.push(new PasswordChangeEvent({ userId: this.id, newPassword, oldPassword }));
+		DomainEvents.dispatch([new PasswordChangeEvent(this.id)]);
 		this.touch();
 	}
 
@@ -113,13 +111,13 @@ export class User {
 		if (newRole === this.props.role) return;
 		const oldRole = this.props.role;
 		this.props.role = newRole;
-		this.events.push(new RoleChangedEvent({ userId: this.id, newRole, oldRole }));
+		DomainEvents.dispatch([new RoleChangedEvent(this.id, newRole, oldRole)]);
 		this.touch();
 	}
 
 	markEmailAsVerified() {
 		this.props.emailVerified = true;
-		this.events.push(new VerifiedUserEvent({ userId: this.id }));
+		DomainEvents.dispatch([new VerifiedUserEvent(this.id)]);
 		this.touch();
 	}
 
@@ -130,12 +128,6 @@ export class User {
 
 	touch() {
 		this.props.updatedAt = new Date();
-	}
-
-	pullEvents(): Events {
-		const events = this.events;
-		this.events = [];
-		return events;
 	}
 
 	toJSON(): UserJSON {

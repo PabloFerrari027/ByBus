@@ -9,7 +9,7 @@ describe('Bus Route', () => {
 	it('should be able to create a bus route', () => {
 		const id = UUID.create();
 		const stops: Array<BusStop> = [];
-		const busRoute = BusRoute.create({ id, stops });
+		const busRoute = BusRoute.create({ id, status: 'ACTIVE', stops });
 		assert.ok(busRoute instanceof BusRoute);
 		assert.ok(id.equals(busRoute.id));
 		assert.ok(busRoute.id instanceof UUID);
@@ -17,7 +17,7 @@ describe('Bus Route', () => {
 	});
 
 	it('should be able to add stop', () => {
-		const busRoute = BusRoute.create({ id: UUID.create(), stops: [] });
+		const busRoute = BusRoute.create({ id: UUID.create(), status: 'ACTIVE', stops: [] });
 		const location = Location.create({ latitude: 0, longitude: 0 });
 		const busStop = BusStop.create({ id: UUID.create(), location });
 		busRoute.addStop(busStop);
@@ -25,7 +25,7 @@ describe('Bus Route', () => {
 	});
 
 	it('should be able to throw an error if the bus stop already exists', () => {
-		const busRoute = BusRoute.create({ id: UUID.create(), stops: [] });
+		const busRoute = BusRoute.create({ id: UUID.create(), status: 'ACTIVE', stops: [] });
 		const location = Location.create({ latitude: 0, longitude: 0 });
 		const busStop = BusStop.create({ id: UUID.create(), location });
 		busRoute.addStop(busStop);
@@ -38,7 +38,7 @@ describe('Bus Route', () => {
 		const location = Location.create({ latitude: 0, longitude: 0 });
 		const busStop = BusStop.create({ id: UUID.create(), location });
 		stops.push(busStop);
-		const busRoute = BusRoute.create({ id, stops });
+		const busRoute = BusRoute.create({ id, status: 'ACTIVE', stops });
 		assert.deepStrictEqual(busRoute.toJSON(), {
 			id: id.toJSON(),
 			stops: stops.map(i => i.toJSON()),

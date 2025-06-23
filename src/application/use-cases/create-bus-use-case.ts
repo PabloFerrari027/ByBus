@@ -19,6 +19,7 @@ type Output = Promise<Either<Left, Right>>;
 
 interface Input {
 	licensePlate: string;
+	userId: string;
 }
 
 export class CreateBusUseCase extends UseCase<Right, Input> {
@@ -61,7 +62,10 @@ export class CreateBusUseCase extends UseCase<Right, Input> {
 
 		await this.busRepository.create(this.bus);
 
-		await this.loggerProvider.info({ message: 'Bus Created', meta: { busId: this.bus.id.value } });
+		await this.loggerProvider.info({
+			message: 'Bus Created',
+			meta: { busId: this.bus.id.value, userId: input.userId },
+		});
 
 		return right({ bus: this.bus });
 	}

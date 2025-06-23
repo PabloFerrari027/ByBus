@@ -11,13 +11,12 @@ import { TokenStrategy } from '../strategies/token-strategy.js';
 import { NotAcceptable } from '@/domain/errors/not-acceptable.js';
 import { Token } from '@/domain/entities/token.js';
 import { CreateSessionService } from '@/domain/services/create-session-service.js';
-import { EventBus } from '@/infraestructure/event-bus/domain-events.js';
-import { CreatedUserEvent } from '@/domain/events/created-user-event.js';
 import { AlreadyExists } from '@/domain/errors/already-exists.js';
 import { CreatedSessionEvent } from '@/domain/events/created-session-event.js';
 import { Email } from '@/domain/value-objects/email.js';
 import { Name } from '@/domain/value-objects/name.js';
 import { Password } from '@/domain/value-objects/password.js';
+import { DomainEvents } from '@/infraestructure/event-bus/domain-events.js';
 
 interface Right {
 	accessToken: Token<{ userId: UUID; sessionId: UUID }>;
@@ -81,7 +80,7 @@ export class SigninUseCase extends UseCase<Right, Input> {
 		const id = UUID.create();
 		const email = Email.create(input.email);
 		const name = Name.create(input.name);
-		const password = await Password.create(input.name);
+		const password = input.password ? await Password.create(input.password) : null;
 
 		this.user = User.create({
 			id,
@@ -112,6 +111,7 @@ export class SigninUseCase extends UseCase<Right, Input> {
 		if (response.isLeft()) return left(response.value);
 
 		this.session = response.value.session;
+
 		await this.loggerProvider.info({
 			message: 'Session Created',
 			meta: { userId: this.user.id.value, sessionId: this.session.id.value },
@@ -125,8 +125,7 @@ export class SigninUseCase extends UseCase<Right, Input> {
 			expiresAt,
 		);
 
-		EventBus.publish(new CreatedUserEvent({ userId: this.user.id }));
-		EventBus.publish(new CreatedSessionEvent({ userId: this.user.id, sessionId: this.session.id }));
+		DomainEvents.dispatch([new CreatedSessionEvent(this.user.id, this.session.id)]);
 
 		return right({ session: this.session, user: this.user, accessToken });
 	}

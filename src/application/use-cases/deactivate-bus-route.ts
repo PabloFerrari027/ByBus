@@ -15,6 +15,7 @@ type Output = Promise<Either<Left, Right>>;
 
 interface Input {
 	routeId: string;
+	userId: string;
 }
 
 export class DeactivateBusRouteUseCase extends UseCase<Right, Input> {
@@ -40,7 +41,7 @@ export class DeactivateBusRouteUseCase extends UseCase<Right, Input> {
 
 		await this.loggerProvider.info({
 			message: 'Bus Route Deactivated',
-			meta: { routeId: busRoute.id.value },
+			meta: { routeId: busRoute.id.value, userId: input.userId },
 		});
 
 		return right({ busRoute });

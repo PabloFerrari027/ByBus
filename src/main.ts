@@ -16,6 +16,7 @@ import { MakeUserVerificationCodeRepository } from './infraestructure/factories/
 import { BusRouter } from './infraestructure/http/routers/bus-router.js';
 import { MakeBusRepository } from './infraestructure/factories/make-bus-repository.js';
 import { DomainEventsManager } from './infraestructure/event-bus/domain-events-manager.js';
+import { MakeBusStopRepository } from './infraestructure/factories/make-bus-stop-repository.js';
 
 const queuesProvider = MakeQueuesProvider('IN-MEMORY');
 const usersRepository = MakeUsersRepository('IN-MEMORY');
@@ -27,18 +28,17 @@ const tokenStrategy = new JWTTokenStrategy(ENVProvider);
 const sessionsRepository = MakeSessionsRepository('IN-MEMORY');
 const userVerificationCodeRepository = MakeUserVerificationCodeRepository('IN-MEMORY');
 const credentialAuthStrategy = new CredentialAuthStrategy(usersRepository);
-const googleAuthStrategy = new GoogleAuthStrategy(ENVProvider);
+const googleAuthStrategy = new GoogleAuthStrategy(ENVProvider, usersRepository);
 const busRepository = MakeBusRepository('IN-MEMORY');
+const busStopRepository = MakeBusStopRepository('IN-MEMORY');
 
-new DomainEventsManager(queuesProvider);
+new DomainEventsManager(queuesProvider, usersRepository);
 
 const queueManager = new QueueManager(
 	queuesProvider,
 	notificationsProvider,
 	usersRepository,
 	templateRepository,
-	ENVProvider,
-	tokenStrategy,
 	userVerificationCodeRepository,
 	loggerProvider,
 );
