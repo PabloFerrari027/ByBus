@@ -32,7 +32,7 @@ export class Name {
 
 		const invalidChars = /[^a-zA-ZÀ-ÿ\s'-]/;
 		if (invalidChars.test(name)) {
-			throw new NotAcceptable('Invalid name', 'Name contains invalid characters');
+			throw new NotAcceptable('Invalid Name', 'Name contains invalid characters');
 		}
 	}
 

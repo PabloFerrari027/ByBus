@@ -1,5 +1,5 @@
 import { BusStopRepository } from '@/application/ports/repositories/bus-stop-repository.js';
-import { BusStop } from '@/domain/entities/bus-stop.js';
+import { BusStop, Props } from '@/domain/entities/bus-stop.js';
 import { Email } from '@/domain/value-objects/email.js';
 import { Name } from '@/domain/value-objects/name.js';
 import { UUID } from '@/domain/value-objects/uuid.js';
@@ -68,6 +68,27 @@ export class InMemoryBusStopRepository implements BusStopRepository {
 
 		const pages = Math.ceil(this.items.length / 100);
 		const data = this.items.slice(start, end).sort((a, b) => this.sort(a, b, orderBy, ordem));
+
+		return { data, pages };
+	}
+
+	async listByRouteId(
+		routeId: string,
+		options?: ListingParameters<Props>,
+	): ListingResponse<BusStop> {
+		const page = options?.page ?? 1;
+		const ordem = options?.ordem ?? 'DESC';
+		const orderBy = options?.orderBy ?? 'id';
+
+		const start = (page - 1) * 100;
+		const end = start + 100;
+
+		const items = this.items.filter(
+			item => !!item.routes.find(item => item.routeId.equals(routeId)),
+		);
+
+		const pages = Math.ceil(items.length / 100);
+		const data = items.slice(start, end).sort((a, b) => this.sort(a, b, orderBy, ordem));
 
 		return { data, pages };
 	}

@@ -88,7 +88,7 @@ export class SigninUseCase extends UseCase<Right, Input> {
 			email,
 			name,
 			password,
-			emailVerified: authProvider !== 'CREDENTIALS',
+			isEmailVerified: authProvider !== 'CREDENTIALS',
 			role: 'CLIENT',
 			createdAt: new Date(),
 			updatedAt: new Date(),

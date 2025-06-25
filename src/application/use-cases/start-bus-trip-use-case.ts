@@ -72,6 +72,7 @@ export class StartBusTripUseCase extends UseCase<Right, Input> {
 			endTime: null,
 			routeId: busRoute.id,
 			startTime: new Date(),
+			passengers: [],
 		});
 
 		await this.busTripRepository.create(busTrip);

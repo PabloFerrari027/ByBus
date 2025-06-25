@@ -34,6 +34,7 @@ export class CreateBusRouteUseCase extends UseCase<Right, Input> {
 			id: UUID.create(),
 			status: 'ACTIVE',
 			location: Location.create({ latitude: input.latitude, longitude: input.longitude }),
+			routes: [],
 		});
 
 		await this.busStopRepository.create(busStop);

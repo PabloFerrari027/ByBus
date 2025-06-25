@@ -1,7 +1,7 @@
 import { NotAcceptable } from '../errors/not-acceptable.js';
 import { Location, LocationJSON } from '../value-objects/location.js';
 import { UUID, UUIDJSON } from '../value-objects/uuid.js';
-import { BusRouteStop } from './bus-route-stop.js';
+import { BusRouteStop, BusRouteStopJSON } from './bus-route-stop.js';
 
 export type BusStopStatus = 'ACTIVE' | 'DEACTIVATED';
 
@@ -9,12 +9,14 @@ export interface Props {
 	id: UUID;
 	location: Location;
 	status: BusStopStatus;
+	routes: Array<BusRouteStop>;
 }
 
 export interface BusStopJSON {
 	id: UUIDJSON;
 	location: LocationJSON;
 	status: BusStopStatus;
+	routes: Array<BusRouteStopJSON>;
 }
 
 export class BusStop {
@@ -34,6 +36,10 @@ export class BusStop {
 
 	get location(): Location {
 		return this.props.location;
+	}
+
+	get routes(): Array<BusRouteStop> {
+		return this.props.routes;
 	}
 
 	get isActive(): Boolean {
@@ -67,6 +73,7 @@ export class BusStop {
 			id: this.id.toJSON(),
 			status: this.status,
 			location: this.location.toJSON(),
+			routes: this.routes.map(i => i.toJSON()),
 		};
 	}
 

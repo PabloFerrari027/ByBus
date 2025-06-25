@@ -20,6 +20,7 @@ type Output = Promise<Either<Left, Right>>;
 interface Input {
 	licensePlate: string;
 	userId: string;
+	capacity: number;
 }
 
 export class CreateBusUseCase extends UseCase<Right, Input> {
@@ -58,6 +59,7 @@ export class CreateBusUseCase extends UseCase<Right, Input> {
 			location: Location.create({ latitude: 0, longitude: 0 }),
 			createdAt: new Date(),
 			updatedAt: new Date(),
+			capacity: input.capacity,
 		});
 
 		await this.busRepository.create(this.bus);

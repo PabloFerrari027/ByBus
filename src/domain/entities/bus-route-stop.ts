@@ -4,12 +4,14 @@ export interface Props {
 	id: UUID;
 	routeId: UUID;
 	stopId: UUID;
+	index: number;
 }
 
 export interface BusRouteStopJSON {
 	id: UUIDJSON;
 	route_id: UUIDJSON;
 	stop_id: UUIDJSON;
+	index: number;
 }
 
 export class BusRouteStop {
@@ -31,11 +33,16 @@ export class BusRouteStop {
 		return this.props.stopId;
 	}
 
+	get index(): number {
+		return this.props.index;
+	}
+
 	toJSON(): BusRouteStopJSON {
 		return {
 			id: this.id.toJSON(),
 			route_id: this.routeId.toJSON(),
 			stop_id: this.stopId.toJSON(),
+			index: this.index,
 		};
 	}
 

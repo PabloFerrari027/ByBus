@@ -21,7 +21,7 @@ export interface Props {
 	password: Password | null;
 	role: UserRole;
 	authProvider: AuthProvider;
-	emailVerified: boolean;
+	isEmailVerified: boolean;
 	createdAt: Date;
 	updatedAt: Date;
 }
@@ -74,7 +74,7 @@ export class User {
 	}
 
 	get isEmailVerified() {
-		return this.props.emailVerified;
+		return this.props.isEmailVerified;
 	}
 
 	get createdAt(): Date {
@@ -116,7 +116,7 @@ export class User {
 	}
 
 	markEmailAsVerified() {
-		this.props.emailVerified = true;
+		this.props.isEmailVerified = true;
 		DomainEvents.dispatch([new VerifiedUserEvent(this.id)]);
 		this.touch();
 	}
@@ -172,7 +172,7 @@ export class User {
 			email: props.email,
 			password: props.password,
 			role: props.role,
-			emailVerified: props.emailVerified,
+			isEmailVerified: props.isEmailVerified,
 			authProvider: props.authProvider,
 		});
 

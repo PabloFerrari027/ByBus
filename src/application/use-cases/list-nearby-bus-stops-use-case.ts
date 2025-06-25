@@ -1,13 +1,13 @@
 import { Either, left, right } from '@/shared/types/either.js';
-import { BusRepository } from '@/application/ports/repositories/bus-repository.js';
-import { Bus } from '@/domain/entities/bus.js';
 import { NotAllowed } from '@/domain/errors/not-allowed.js';
 import { Location } from '@/domain/value-objects/location.js';
 import { UseCase } from '@/shared/core/use-cases/use-case.js';
 import { LoggerProvider } from '../ports/providers/logger-provider.js';
+import { BusStop } from '@/domain/entities/bus-stop.js';
+import { BusStopRepository } from '../ports/repositories/bus-stop-repository.js';
 
 interface Right {
-	buses: Array<Bus>;
+	busStops: Array<BusStop>;
 }
 
 type Left = NotAllowed;
@@ -20,9 +20,9 @@ interface Input {
 	longitude: number;
 }
 
-export class ListNearbyBuses extends UseCase<Right, Input> {
+export class ListNearbyBusStopsUseCase extends UseCase<Right, Input> {
 	constructor(
-		private readonly busRepository: BusRepository,
+		private readonly busStopRepository: BusStopRepository,
 		loggerProvider: LoggerProvider,
 	) {
 		super(loggerProvider);
@@ -37,12 +37,12 @@ export class ListNearbyBuses extends UseCase<Right, Input> {
 
 		const location = Location.create({ latitude: input.latitude, longitude: input.longitude });
 
-		const { data: buses } = await this.busRepository.listByCoordinates(
+		const { data: busStops } = await this.busStopRepository.listByCoordinates(
 			location.latitude,
 			location.longitude,
 			input.radius,
 		);
 
-		return right({ buses });
+		return right({ busStops });
 	}
 }

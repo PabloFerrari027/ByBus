@@ -1,4 +1,4 @@
-import { UserJSON, User } from '@/domain/entities/user.js';
+import { UserJSON, User, Props } from '@/domain/entities/user.js';
 import { right } from '@/shared/types/either.js';
 import { UsersRepository } from '../ports/repositories/users-repository.js';
 import { UseCase, Output } from '@/shared/core/use-cases/use-case.js';
@@ -23,7 +23,7 @@ export class ListUsersUseCase extends UseCase<Right, Input> {
 
 	async execute(input: Input): Output<Right> {
 		const ordem = input.ordem === 'ASC' || input.ordem === 'DESC' ? input.ordem : 'DESC';
-		const options: Record<string, keyof User> = {
+		const options: Record<string, keyof Props> = {
 			id: 'id',
 			name: 'name',
 			email: 'email',

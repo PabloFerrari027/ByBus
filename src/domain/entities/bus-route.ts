@@ -1,6 +1,6 @@
 import { AlreadyExists } from '../errors/already-exists.js';
 import { NotAcceptable } from '../errors/not-acceptable.js';
-import { NotFound } from '../errors/not-found.js';
+import { BusCode } from '../value-objects/bus-code.js';
 import { UUID, UUIDJSON } from '../value-objects/uuid.js';
 import { BusRouteStop, BusRouteStopJSON } from './bus-route-stop.js';
 
@@ -9,13 +9,17 @@ export type BusRouteStatus = 'ACTIVE' | 'DEACTIVATED';
 export interface Props {
 	id: UUID;
 	status: BusRouteStatus;
+	code: BusCode;
 	stops: Array<BusRouteStop>;
+	createdAt: Date;
 }
 
 export interface BusRouteJSON {
 	id: UUIDJSON;
 	status: BusRouteStatus;
+	code: string;
 	stops: Array<BusRouteStopJSON>;
+	created_at: string;
 }
 
 export class BusRoute {
@@ -31,6 +35,14 @@ export class BusRoute {
 
 	get status(): BusRouteStatus {
 		return this.props.status;
+	}
+
+	get code(): BusCode {
+		return this.props.code;
+	}
+
+	get createdAt(): Date {
+		return this.props.createdAt;
 	}
 
 	get stops(): Array<BusRouteStop> {
@@ -84,7 +96,9 @@ export class BusRoute {
 		return {
 			id: this.id.toJSON(),
 			status: this.status,
+			code: this.code.value,
 			stops: this.stops.map(stop => stop.toJSON()),
+			created_at: this.createdAt.toJSON(),
 		};
 	}
 

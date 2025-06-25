@@ -1,5 +1,5 @@
 import { UsersRepository } from '@/application/ports/repositories/users-repository.js';
-import { User } from '@/domain/entities/user.js';
+import { User, Props } from '@/domain/entities/user.js';
 import { Email } from '@/domain/value-objects/email.js';
 import { Name } from '@/domain/value-objects/name.js';
 import { UUID } from '@/domain/value-objects/uuid.js';
@@ -13,7 +13,7 @@ export class InMemoryUsersRepository implements UsersRepository {
 		this.items = [];
 	}
 
-	private sort(a: User, b: User, orderBy: keyof User, ordem: 'ASC' | 'DESC'): number {
+	private sort(a: User, b: User, orderBy: keyof Props, ordem: 'ASC' | 'DESC'): number {
 		const valorA = a[orderBy];
 		const valorB = b[orderBy];
 
@@ -62,7 +62,7 @@ export class InMemoryUsersRepository implements UsersRepository {
 		return this.items.find(user => UUID.compare(user.id, UUID.create(id))) || null;
 	}
 
-	async list(options: ListingParameters<User>): ListingResponse<User> {
+	async list(options: ListingParameters<Props>): ListingResponse<User> {
 		const start = (options.page - 1) * 100;
 		const end = start + 100;
 

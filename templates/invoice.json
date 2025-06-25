@@ -1,0 +1,5 @@
+{
+  "key": "invoice",
+  "subject": "📄 Sua nota fiscal chegou! Obrigado por viajar com a ByBus.",
+  "body": "**Olá {{userName}}!**\n\nTudo certo por aí? Esperamos que sua experiência com a **ByBus** tenha sido incrível! 💙\n\nEstamos enviando a **nota fiscal referente à sua compra de passagem de ônibus**. Você pode baixá-la agora mesmo no link abaixo ou acessá-la diretamente pela sua conta no nosso site.\n\n🔗 **[Clique aqui para baixar sua nota fiscal]( {{invoiceDownloadUrl}} )**\n\n🧾 **Detalhes do documento:**\n- Número da nota fiscal: **{{invoiceNumber}}**\n- Data de emissão: **{{invoiceDate}}**\n- Valor total: **R$ {{invoiceAmount}}**\n\nFicou com alguma dúvida ou precisa de ajuda?\nNossa equipe está sempre por aqui, pronta para te atender com agilidade e carinho.\n\nAgradecemos por escolher a ByBus e esperamos te ver em breve em uma nova viagem. 🚍\n\n**Boa jornada!**\nEquipe **ByBus**\n\n📌 _Viajar bem começa com quem te leva._"
+}

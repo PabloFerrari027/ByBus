@@ -1,4 +1,4 @@
-import { Bus } from '@/domain/entities/bus.js';
+import { Bus, Props } from '@/domain/entities/bus.js';
 import { ListingParameters } from '@/shared/types/listing-parameters.js';
 import { ListingResponse } from '@/shared/types/listing-response.js';
 
@@ -7,11 +7,11 @@ export interface BusRepository {
 	save(bus: Bus): Promise<Bus>;
 	findByLicensePlate(email: string): Promise<Bus | null>;
 	findById(id: string): Promise<Bus | null>;
-	list(options?: ListingParameters<Bus>): ListingResponse<Bus>;
+	list(options?: ListingParameters<Props>): ListingResponse<Bus>;
 	listByCoordinates(
 		latitude: number,
 		longitude: number,
 		radius: number,
-		options?: ListingParameters<Bus>,
+		options?: ListingParameters<Props>,
 	): ListingResponse<Bus>;
 }

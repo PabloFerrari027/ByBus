@@ -1,3 +1,4 @@
+import { NotAcceptable } from '../errors/not-acceptable.js';
 import { LicensePlate, LicensePlateJSON } from '../value-objects/license-plate.js';
 import { Location, LocationJSON } from '../value-objects/location.js';
 import { UUID, UUIDJSON } from '../value-objects/uuid.js';
@@ -6,6 +7,7 @@ export interface Props {
 	id: UUID;
 	location: Location;
 	licensePlate: LicensePlate;
+	capacity: number;
 	createdAt: Date;
 	updatedAt: Date;
 }
@@ -14,6 +16,7 @@ export interface BusJSON {
 	id: UUIDJSON;
 	location: LocationJSON;
 	license_plate: LicensePlateJSON;
+	capacity: number;
 	created_at: string;
 	updated_at: string;
 }
@@ -35,6 +38,10 @@ export class Bus {
 
 	get licensePlate(): LicensePlate {
 		return this.props.licensePlate;
+	}
+
+	get capacity(): number {
+		return this.props.capacity;
 	}
 
 	get createdAt(): Date {
@@ -59,12 +66,18 @@ export class Bus {
 			id: this.props.id.toJSON(),
 			license_plate: this.props.licensePlate.toJSON(),
 			location: this.props.location.toJSON(),
+			capacity: this.props.capacity,
 			created_at: this.props.createdAt.toJSON(),
 			updated_at: this.props.updatedAt.toJSON(),
 		};
 	}
 
 	static create(props: Props) {
+		if (props.capacity < 0) {
+			const title = 'Invalid capacity';
+			const message = 'Capacity less than zero';
+			throw new NotAcceptable(title, message);
+		}
 		return new Bus(props);
 	}
 }
